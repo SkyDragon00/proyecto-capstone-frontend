@@ -6,7 +6,7 @@
   <title>University Events Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}"/>
 </head>
 <body class="bg-gray-50 font-sans">
   
@@ -40,7 +40,7 @@
         <!-- Featured Event 1 -->
         <div class="event-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
           <div class="relative">
-            <img src="assets/imgs/evento1.jpg"
+            <img src="{{ url_for('static', path='imgs/evento1.jpg') }}"
                  alt="Tech Conference" class="w-full h-48 object-cover">
 
           </div>
