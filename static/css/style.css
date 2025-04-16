@@ -1,0 +1,47 @@
+:root {
+    --primary-color: #c10230;
+    --secondary-color: #222222;
+    --terciary-color: #6f7271;
+    --white-color: #ffffff;
+    --links-color: #d3d4df;
+}
+
+.event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* 135deg, #6f7271 0%, */
+
+.hero-section {
+  background: linear-gradient( #222222 100%);
+}
+
+.category-btn.active {
+  background-color: #c10230;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.event-modal {
+  transition: all 0.3s ease;
+}
+
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+  
