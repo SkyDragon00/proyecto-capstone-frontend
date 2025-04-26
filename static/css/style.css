@@ -1,19 +1,150 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap");
+
+/* =========================
+   Variables
+   ========================= */
 :root {
     --primary-color: #c10230;
     --secondary-color: #222222;
-    --terciary-color: #6f7271;
+    --tertiary-color: #6f7271;
     --white-color: #ffffff;
     --links-color: #d3d4df;
+
+    --border: 2px solid var(--primary-color);
+    --border-radius: 6px;
+
+    --opacity: 0.7;
+
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --card-max-width: 400px;
+    --card-padding: 1.5rem;
+    --event-img-height: 250px;
+}
+
+/* =========================
+   Base Styles
+   ========================= */
+* {
+    font-family: "Source Sans 3", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+/* =========================
+   Utilities
+   ========================= */
+.flex-center {
+    display: flex;
+    align-items: center;
+}
+
+.a-button-outline-red {
+    text-decoration: none;
+    background-color: transparent;
+    border: var(--border);
+    border-radius: var(--border-radius);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.a-button-outline-red:hover {
+    opacity: var(--opacity);
+}
+
+.link {
+    text-decoration: none;
+    color: var(--tertiary-color);
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================
+   Event Card Component
+   ========================= */
+.event-card {
+    max-width: var(--card-max-width);
+    padding: var(--card-padding);
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+    border-radius: var(--border-radius);
+
+    figure {
+        margin: calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding))
+            var(--card-padding);
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: var(--event-img-height);
+            object-fit: cover;
+        }
+
+        figcaption {
+            display: none;
+        }
+    }
+
+    figure:hover {
+        figcaption {
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            font-size: small;
+            text-align: center;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: var(--white-color);
+        }
+    }
+
+    .event-card-datetime {
+        font-size: small;
+        color: var(--tertiary-color);
+        margin-bottom: 0.75rem;
+    }
+
+    .event-card-content {
+        h2 {
+            font-size: x-large;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .event-card-description {
+            color: var(--secondary-color);
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    .event-card-footer {
+        justify-content: space-between;
+        margin-top: 1.5rem;
+    }
 }
 
 .event-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
 }
 
-/* 135deg, #6f7271 0%, */
-
-.hero-section {
+/* Añadir estos estilos al CSS existente */
+/*.hero-section {
   background: linear-gradient( #222222 100%);
 }
 
@@ -43,5 +174,4 @@
 
 .modal-overlay {
   background-color: rgba(0, 0, 0, 0.7);
-}
-  
+}*/

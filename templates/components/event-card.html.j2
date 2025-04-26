@@ -1,0 +1,50 @@
+<article class="event-card">
+    <figure>
+        <img src="{{ url_for('static', path='imgs/evento1.jpg') }}" alt="Foto Promocional del {{ event.name }}">
+        <figcaption>Foto Promocional del {{ event.name }}</figcaption>
+    </figure>
+
+    <div class="event-card-datetime flex-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-smile">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path
+                d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12zm12 -4v4m-8 -4v4m-4 4h16m-9.995 3h.01m3.99 0h.01" />
+            <path d="M10.005 17a3.5 3.5 0 0 0 4 0" />
+        </svg>&nbsp;
+        <time datetime="{{ event.event_dates[0].day_date }}">
+            {{ event.event_dates[0].day_date }} • {{ event.event_dates[0].start_time }}
+        </time>
+    </div>
+
+    <div class="event-card-content">
+        <h2>{{ event.name }}</h2>
+
+        <p class="event-card-description">
+            {{ event.description | truncate(200, True, '...') }}
+        </p>
+    </div>
+
+    <div class="event-card-footer flex-center">
+        <a href="{{ event.maps_link }}" class="link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
+                class="icon icon-tabler icons-tabler-filled icon-tabler-map-pin">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path
+                    d="M18.364 4.636a9 9 0 0 1 .203 12.519l-.203 .21l-4.243 4.242a3 3 0 0 1 -4.097 .135l-.144 -.135l-4.244 -4.243a9 9 0 0 1 12.728 -12.728zm-6.364 3.364a3 3 0 1 0 0 6a3 3 0 0 0 0 -6z" />
+            </svg>
+            &nbsp;{{ event.location }}
+        </a>
+
+        <a href="#" class="a-button-outline-red">
+            Ver Detalles
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M9 6l6 6l-6 6" />
+            </svg>
+        </a>
+    </div>
+</article>
