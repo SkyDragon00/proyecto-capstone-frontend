@@ -3,55 +3,49 @@
 {% block title %}Inicio{% endblock title %}
 
 {% block header %}
-<header class="bg-white shadow-sm sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-1 flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-            <img src="{{ url_for('static', path='imgs/LogoUdlaColorTexto.png') }}" alt="Logo UDLA"
-                class="h-20 w-auto" />
+<div class="flex-center top-header">
+    <img src="{{ url_for('static', path='imgs/LogoUdlaColorTexto.png') }}" alt="Logo UDLA" height="36px" />
 
-        </div>
-        <nav class="hidden md:flex space-x-8">
-            <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Home</a>
-            <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Eventos</a>
-            <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Contacto</a>
-        </nav>
+    <div>
         <div class="flex items-center space-x-4">
-            <button style="background-color: var(--primary-color);"
-                class="text-white px-4 py-2 rounded-lg hover:brightness-90 transition">
-                <i class="fas fa-user mr-2"></i> Mi Perfil
-            </button>
-            <button class="md:hidden text-gray-700" id="mobile-menu-button">
-                <i class="fas fa-bars text-2xl"></i>
-            </button>
+            <a class="a-button-outline-red" style="--padding: 0.2rem 1rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-user">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                </svg>
+            </a>
         </div>
-
-
-        <!-- Mobile Menu -->
-        <div class="md:hidden hidden bg-white w-full py-4 px-4 shadow-md" id="mobile-menu">
-            <div class="flex flex-col space-y-3">
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Home</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Events</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Contact</a>
-            </div>
-        </div>
-</header>
+    </div>
+</div>
+<nav class="bottom-header">
+    <a href="#">Home</a>
+    <a href="#">Eventos</a>
+    <a href="#">Contacto</a>
+</nav>
 {% endblock header %}
 
 {% block main %}
-<section class="hero-section text-white py-16">
-    <div class="container mx-auto px-4 flex flex-col items-center text-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-6 animate-fade-in">Descubre emocionantes eventos universitarios
+<section class="hero flex-center">
+    <div class="hero-left">
+        <h1 class="">
+            Descubre emocionantes eventos universitarios
         </h1>
-        <p class="text-xl mb-8 max-w-2xl opacity-90 animate-fade-in" style="animation-delay: 0.2s;">
-            Explore y descubre todas las oportunidades que tiene la UDLA para ti.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-lg animate-fade-in" style="animation-delay: 0.4s;">
-            <input type="text" placeholder="Buscar eventos..." class="flex-grow px-4 py-3 rounded-lg text-gray-800" />
-            <button class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
-                <i class="fas fa-search mr-2"></i> Buscar
-            </button>
-        </div>
+        <a href="#" class="a-button-filled-red" style="--padding: 0 1.7rem 0 2rem;">
+            Log In
+            <animated-icons
+                src="https://animatedicons.co/get-icon?name=Activate&style=minimalistic&token=98bf6abb-a20e-4455-a6cd-c57c4b80012c"
+                trigger="loop"
+                attributes='{"variationThumbColour":"#536DFE","variationName":"Two Tone","variationNumber":2,"numberOfGroups":2,"backgroundIsGroup":false,"strokeWidth":1,"defaultColours":{"group-1":"#000000","group-2":"#C10230FF","background":"#FFFFFF"}}'
+                height="50" width="50"></animated-icons>
+        </a>
     </div>
+    <figure class="hero-right">
+        <img src="{{ url_for('static', path='imgs/hero.webp') }}" alt="Imagen de eventos universitarios" />
+        <!-- <figcaption>Imagen de eventos universitarios</figcaption> -->
+    </figure>
 </section>
 
 <!-- Featured Events Section -->
@@ -72,14 +66,8 @@
         </div>
     </div>
 </section>
-
-<!-- Upcoming Events (dynamic) -->
-<section class="py-12 bg-gray-50">
-    <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Upcoming Events</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="events-container">
-            <!-- Event cards will be loaded here dynamically -->
-        </div>
-    </div>
-</section>
 {% endblock main %}
+
+{% block scripts %}
+<script src="https://animatedicons.co/scripts/embed-animated-icons.js"></script>
+{% endblock scripts %}

@@ -30,10 +30,36 @@
     font-weight: 400;
     font-style: normal;
     box-sizing: border-box;
+    padding: 0;
+    margin: 0;
 }
 
 html {
     font-size: 16px;
+
+    header {
+        .top-header {
+            padding: 0.75rem 3rem;
+            justify-content: space-between;
+        }
+
+        .bottom-header {
+            padding: 0.5rem 3rem;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+
+            a {
+                color: var(--white-color);
+                text-decoration: none;
+                padding: 0 3rem;
+                border-right: 1px solid var(--white-color);
+            }
+
+            a:hover {
+                opacity: var(--opacity);
+            }
+        }
+    }
 }
 
 /* =========================
@@ -45,12 +71,14 @@ html {
 }
 
 .a-button-outline-red {
+    --padding: 0.5rem 1rem;
+
     text-decoration: none;
     background-color: transparent;
     border: var(--border);
     border-radius: var(--border-radius);
     color: var(--primary-color);
-    padding: 0.5rem 1rem;
+    padding: var(--padding);
     font-size: 1rem;
     cursor: pointer;
     display: inline-flex;
@@ -62,6 +90,26 @@ html {
     opacity: var(--opacity);
 }
 
+.a-button-filled-red {
+    --padding: 0.5rem 1rem;
+
+    text-decoration: none;
+    background-color: var(--primary-color);
+    border: var(--border);
+    border-radius: var(--border-radius);
+    color: var(--white-color);
+    padding: var(--padding);
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.a-button-filled-red:hover {
+    opacity: var(--opacity);
+}
+
 .link {
     text-decoration: none;
     color: var(--tertiary-color);
@@ -69,6 +117,33 @@ html {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+section.hero {
+    background-color: var(--secondary-color);
+    height: 50vh;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+
+    .hero-left {
+        padding: 0 0 0 5rem;
+
+        h1 {
+            font-size: 2rem;
+            color: var(--white-color);
+            font-weight: 700;
+            margin: 2rem 0;
+        }
+
+        .a-button-filled-red {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+    }
+
+    .hero-right {
+        width: 50%;
+        overflow: hidden;
+    }
 }
 
 /* =========================
