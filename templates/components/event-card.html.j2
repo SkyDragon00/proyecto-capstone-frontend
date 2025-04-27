@@ -1,4 +1,4 @@
-<article class="event-card">
+<article class="event-card card" tabindex="0">
     <figure>
         <img src="{{ url_for('static', path='imgs/evento1.jpg') }}" alt="Foto Promocional del {{ event.name }}">
         <figcaption>Foto Promocional del {{ event.name }}</figcaption>
@@ -26,7 +26,7 @@
         </p>
     </div>
 
-    <div class="event-card-footer flex-center">
+    <div class="event-card-footer flex-center justify-between">
         <a href="{{ event.maps_link }}" class="link">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
                 class="icon icon-tabler icons-tabler-filled icon-tabler-map-pin">

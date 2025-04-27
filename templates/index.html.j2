@@ -7,17 +7,15 @@
     <img src="{{ url_for('static', path='imgs/LogoUdlaColorTexto.png') }}" alt="Logo UDLA" height="36px" />
 
     <div>
-        <div class="flex items-center space-x-4">
-            <a class="a-button-outline-red" style="--padding: 0.2rem 1rem;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-user">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                </svg>
-            </a>
-        </div>
+        <a class="a-button-outline-red" style="--padding: 0.2rem 1rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-user">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+            </svg>
+        </a>
     </div>
 </div>
 <nav class="bottom-header">
@@ -30,7 +28,7 @@
 {% block main %}
 <section class="hero flex-center">
     <div class="hero-left">
-        <h1 class="">
+        <h1 class="hero-title">
             Descubre emocionantes eventos universitarios
         </h1>
         <a href="#" class="a-button-filled-red" style="--padding: 0 1.7rem 0 2rem;">
@@ -48,23 +46,32 @@
     </figure>
 </section>
 
-<!-- Featured Events Section -->
-<section class="py-12 bg-white">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">Eventos relevantes</h2>
-            <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
-                Ver todos <i class="fas fa-arrow-right ml-2"></i>
-            </a>
-        </div>
-
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for event in events %}
-            {% include "./components/event-card.html.j2" %}
-            {% endfor %}
-        </div>
+<section class="upcoming-events">
+    <div class="flex-center justify-between">
+        <h2>
+            Próximos Eventos
+        </h2>
+        <a href="#" class="flex-center a-button-outline-red">
+            Ver todos
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-narrow-right">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 12l14 0" />
+                <path d="M15 16l4 -4" />
+                <path d="M15 8l4 4" />
+            </svg>
+        </a>
     </div>
+
+
+    <ul class="list-upcoming-events">
+        {% for event in events %}
+        <li>
+            {% include "./components/event-card.html.j2" %}
+        </li>
+        {% endfor %}
+    </ul>
 </section>
 {% endblock main %}
 

@@ -27,53 +27,53 @@ reset_app.py
 *_LOCAL_*.txt
 *_REMOTE_*.txt
 
-### Images ###
-# JPEG
-*.jpg
-*.jpeg
-*.jpe
-*.jif
-*.jfif
-*.jfi
+# ### Images ###
+# # JPEG
+# *.jpg
+# *.jpeg
+# *.jpe
+# *.jif
+# *.jfif
+# *.jfi
 
-# JPEG 2000
-*.jp2
-*.j2k
-*.jpf
-*.jpx
-*.jpm
-*.mj2
+# # JPEG 2000
+# *.jp2
+# *.j2k
+# *.jpf
+# *.jpx
+# *.jpm
+# *.mj2
 
-# JPEG XR
-*.jxr
-*.hdp
-*.wdp
+# # JPEG XR
+# *.jxr
+# *.hdp
+# *.wdp
 
-# Graphics Interchange Format
-*.gif
+# # Graphics Interchange Format
+# *.gif
 
-# RAW
-*.raw
+# # RAW
+# *.raw
 
-# Web P
-*.webp
+# # Web P
+# *.webp
 
-# Portable Network Graphics
-*.png
+# # Portable Network Graphics
+# *.png
 
-# Animated Portable Network Graphics
-*.apng
+# # Animated Portable Network Graphics
+# *.apng
 
-# Multiple-image Network Graphics
-*.mng
+# # Multiple-image Network Graphics
+# *.mng
 
-# Tagged Image File Format
-*.tiff
-*.tif
+# # Tagged Image File Format
+# *.tiff
+# *.tif
 
-# Scalable Vector Graphics
-*.svg
-*.svgz
+# # Scalable Vector Graphics
+# *.svg
+# *.svgz
 
 # Portable Document Format
 *.pdf
@@ -86,7 +86,7 @@ reset_app.py
 *.dib
 
 # ICO
-*.ico
+# *.ico
 
 # 3D Images
 *.3dm

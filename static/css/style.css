@@ -62,12 +62,27 @@ html {
     }
 }
 
+h2 {
+    font-size: 2rem;
+    color: var(--secondary-color);
+    font-weight: 700;
+    margin: 2rem 0;
+}
+
+li {
+    list-style: none;
+}
+
 /* =========================
    Utilities
    ========================= */
 .flex-center {
     display: flex;
     align-items: center;
+}
+
+.justify-between {
+    justify-content: space-between;
 }
 
 .a-button-outline-red {
@@ -125,9 +140,9 @@ section.hero {
     clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
 
     .hero-left {
-        padding: 0 0 0 5rem;
+        padding-left: 5rem;
 
-        h1 {
+        .hero-title {
             font-size: 2rem;
             color: var(--white-color);
             font-weight: 700;
@@ -146,6 +161,97 @@ section.hero {
     }
 }
 
+section.upcoming-events {
+    padding: 2rem;
+
+    .list-upcoming-events {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 2rem;
+    }
+}
+
+footer {
+    margin-top: 2rem;
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+
+    .left-footer {
+        width: 70vw;
+        padding: 3rem;
+
+        .top-left-footer {
+            display: flex;
+            align-items: start;
+
+            a {
+                color: var(--links-color);
+                text-decoration: none;
+                margin-bottom: 1rem;
+                svg {
+                    height: 1rem;
+                }
+            }
+            .section-footer-title {
+                font-size: 1.2rem;
+                color: var(--white-color);
+                font-weight: 700;
+                margin-bottom: 2rem;
+            }
+
+            .top-left-footer-slogan {
+                color: var(--white-color);
+                width: 20vw;
+
+                h3 {
+                    font-size: 1.5rem;
+                    font-weight: 800;
+                }
+            }
+        }
+    }
+
+    .right-footer {
+        background-color: var(--primary-color);
+        width: 30vw;
+        height: auto;
+        padding: 3rem 6rem;
+        clip-path: polygon(0 100%, 20% 0, 100% 0, 100% 100%, 0 100%);
+
+        a {
+            color: var(--white-color);
+            text-decoration: none;
+        }
+
+        .logo-footer {
+            height: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-contact-list {
+            margin-bottom: 2rem;
+
+            li {
+                margin-bottom: 1rem;
+            }
+        }
+
+        .footer-social-media-list {
+            h3 {
+                color: var(--white-color);
+                font-weight: 700;
+                margin-bottom: 2rem;
+            }
+
+            ul {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+    }
+}
+
 /* =========================
    Event Card Component
    ========================= */
@@ -155,6 +261,12 @@ section.hero {
     box-shadow: var(--shadow);
     transition: transform 0.2s;
     border-radius: var(--border-radius);
+    margin: 1rem;
+    height: 100%;
+    /* Flex colum */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     figure {
         margin: calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding))
@@ -207,46 +319,8 @@ section.hero {
             margin-bottom: 1.5rem;
         }
     }
-
-    .event-card-footer {
-        justify-content: space-between;
-        margin-top: 1.5rem;
-    }
 }
 
 .event-card:hover {
     transform: translateY(-3px);
 }
-
-/* Añadir estos estilos al CSS existente */
-/*.hero-section {
-  background: linear-gradient( #222222 100%);
-}
-
-.category-btn.active {
-  background-color: #c10230;
-  color: white;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-.event-modal {
-  transition: all 0.3s ease;
-}
-
-.modal-overlay {
-  background-color: rgba(0, 0, 0, 0.7);
-}*/
