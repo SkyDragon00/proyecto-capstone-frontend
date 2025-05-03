@@ -1,0 +1,120 @@
+#bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 5rem;
+
+    .login-form {
+        width: 100%;
+        max-width: 500px;
+        background-color: var(--white-color);
+        border-radius: var(--border-radius-large);
+
+        .login-header {
+            color: var(--white-color);
+            text-align: center;
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius-large) var(--border-radius-large)
+                0 0;
+            padding: 3rem;
+
+            svg {
+                background-color: var(--white-color);
+                color: var(--primary-color);
+                border-radius: 100%;
+                padding: 0.6rem;
+            }
+
+            h1 {
+                font-weight: 700;
+            }
+        }
+
+        .login-footer {
+            color: var(--white-color);
+            text-align: center;
+            padding: 0 3rem 2rem;
+
+            .a-button-outline-red {
+                width: 100%;
+            }
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem;
+            padding-bottom: 0;
+
+            input {
+                margin-bottom: 1rem;
+                width: 100%;
+                padding: 0.5rem;
+                border-radius: var(--border-radius);
+                border: var(--border);
+                font-size: 1rem;
+                color: var(--primary-color);
+            }
+
+            #username::placeholder {
+                background-image: url(https://img.icons8.com/?size=100&id=85500&format=png&color=6f7271);
+                background-size: 20px;
+                background-repeat: no-repeat;
+                background-position: left center;
+                padding-left: 25px;
+            }
+
+            #password::placeholder {
+                background-image: url(https://img.icons8.com/?size=100&id=9697&format=png&color=6f7271);
+                background-size: 20px;
+                background-repeat: no-repeat;
+                background-position: left center;
+                padding-left: 25px;
+            }
+
+            button {
+                width: 100%;
+                margin-top: 1rem;
+            }
+        }
+        /* CSS */
+        .divider-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem;
+        }
+
+        .divider-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            border-top: 1px solid #d1d5db; /* gray-300 */
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .divider-text {
+            position: relative;
+            z-index: 2;
+            background: var(--white-color);
+            padding: 0 0.75rem;
+            color: var(--tertiary-color);
+            font-size: 0.875rem;
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "My Python Debugger: FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "purpose": [
+                "debug-test",
+                "debug-in-terminal"
+            ],
+            "module": "fastapi",
+            "args": [
+                "dev",
+                "--port",
+                "8080",
+            ],
+            "jinja": true,
+            "serverReadyAction": {
+                "pattern": ".+http://127.0.0.1:(\\d+)",
+                "uriFormat": "http://127.0.0.1:%s/docs",
+                "action": "openExternally",
+            },
+        }
+    ]
+}

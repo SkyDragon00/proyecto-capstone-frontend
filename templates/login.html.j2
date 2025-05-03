@@ -1,0 +1,72 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Log In{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
+{% endblock head %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<video autoplay loop muted playsinline id="bg-video">
+    <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+</video>
+
+<div class="login-container">
+    <div class="login-form">
+        <div class="login-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-device-projector">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M8 9a5 5 0 1 0 10 0a5 5 0 0 0 -10 0" />
+                <path d="M9 6h-4a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2 -2v-8a2 2 0 0 0 -2 -2h-2" />
+                <path d="M6 15h1" />
+                <path d="M7 18l-1 2" />
+                <path d="M18 18l1 2" />
+            </svg>
+
+            <h1>Log In</h1>
+
+            <p>Inicia sesión para acceder a tu cuenta.</p>
+        </div>
+
+        <form method="post" action="/login" id="login-form">
+            <label for="username">Email:</label>
+            <input type="email" id="username" name="username" required placeholder="ejemplo@gmail.com">
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required placeholder="••••••••">
+
+            <input type="hidden" name="grant_type" value="password">
+            <input type="hidden" name="scope" value="organizer">
+
+            <button type="submit" class="a-button-filled-red">Log In</button>
+        </form>
+
+        <!-- HTML -->
+        <div class="divider-container">
+            <div class="divider-line"></div>
+            <div class="divider-text">
+                <span>¿No tienes cuenta?</span>
+            </div>
+        </div>
+
+        <div class="login-footer">
+            <a href="/register" class="a-button-outline-red">Regístrate</a>
+        </div>
+    </div>
+</div>
+{% endblock main %}
