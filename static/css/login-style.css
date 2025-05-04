@@ -58,6 +58,13 @@
             padding: 3rem;
             padding-bottom: 0;
 
+            .input-group {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+            }
+
             input {
                 margin-bottom: 1rem;
                 width: 100%;
@@ -65,10 +72,26 @@
                 border-radius: var(--border-radius);
                 border: var(--border);
                 font-size: 1rem;
-                color: var(--primary-color);
+            }
+
+            select {
+                margin-bottom: 1rem;
+                width: 100%;
+                padding: 0.4rem;
+                border-radius: var(--border-radius);
+                border: var(--border);
+                font-size: 1rem;
             }
 
             #username::placeholder {
+                background-image: url(https://img.icons8.com/?size=100&id=85500&format=png&color=6f7271);
+                background-size: 20px;
+                background-repeat: no-repeat;
+                background-position: left center;
+                padding-left: 25px;
+            }
+
+            #email::placeholder {
                 background-image: url(https://img.icons8.com/?size=100&id=85500&format=png&color=6f7271);
                 background-size: 20px;
                 background-repeat: no-repeat;
@@ -84,9 +107,39 @@
                 padding-left: 25px;
             }
 
+            #confirm_password::placeholder {
+                background-image: url(https://img.icons8.com/?size=100&id=9697&format=png&color=6f7271);
+                background-size: 20px;
+                background-repeat: no-repeat;
+                background-position: left center;
+                padding-left: 25px;
+            }
+
+            .checkbox-container {
+                input[type="checkbox"] {
+                    margin: 0;
+                    width: 1rem;
+                    height: 1rem;
+                    margin-right: 0.5rem;
+                }
+            }
+
             button {
                 width: 100%;
                 margin-top: 1rem;
+            }
+
+            #capture {
+                margin-top: 0;
+                margin-bottom: 1rem;
+            }
+
+            #video {
+                width: 100%;
+            }
+
+            #preview {
+                margin-bottom: 1rem;
             }
         }
         /* CSS */

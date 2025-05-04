@@ -4,8 +4,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import httpx
-from pydantic import BaseModel
 import requests
+
+from models.models import LoginForm, SignupForm
 
 app = FastAPI()
 
@@ -54,7 +55,7 @@ async def home(request: Request):
     response_class=HTMLResponse,
     summary="Endpoint to retrieve the login page"
 )
-async def login(request: Request):
+def login(request: Request):
     """Endpoint to retrieve the login page.
 
     \f
@@ -74,35 +75,13 @@ async def login(request: Request):
     )
 
 
-class LoginForm(BaseModel):
-    """Class representing the login form data.
-
-    \f
-
-    :param username: Username of the user.
-    :type username: str
-
-    :param password: Password of the user.
-    :type password: str
-
-    :param grant_type: Grant type for the OAuth2 token request.
-    :type grant_type: str
-
-    :param scope: Scope for the OAuth2 token request.
-    :type scope: str
-    """
-    username: str
-    password: str
-    grant_type: str
-    scope: str
-
-
 @app.post(
     "/login",
     response_class=RedirectResponse,
-    summary="Endpoint to handle login form submission"
+    summary="Endpoint to handle login form submission",
+    status_code=status.HTTP_303_SEE_OTHER
 )
-async def handle_login(
+def handle_login(
     form: Annotated[LoginForm, Form()]
 ):
     """Endpoint to handle login form submission.
@@ -124,9 +103,69 @@ async def handle_login(
         token = response.json().get("access_token")
         # Store the token in a session or cookie as needed
         # For example, using a cookie:
-        response = RedirectResponse(
-            url="/home",
-            status_code=status.HTTP_303_SEE_OTHER
-        )
+        response = RedirectResponse(url="/home")
         response.set_cookie(key="access_token", value=token, httponly=True)
         return response
+
+
+@app.get(
+    "/signup",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the signup page"
+)
+def signup(request: Request):
+    """Endpoint to retrieve the signup page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="signup.html.j2",
+        context={
+            "request": request
+        }
+    )
+
+
+@app.post(
+    "/signup",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle signup form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_signup(
+    form: Annotated[
+        SignupForm,
+        Form(
+            media_type="multipart/form-data",
+        )
+    ],
+):
+    """Endpoint to handle signup form submission.
+
+    \f
+
+    :param form: SignupForm object containing the form data.
+    :type form: SignupForm
+    :return: Redirect response to the home page.
+    :rtype: RedirectResponse
+    """
+
+    files = {
+        "image": (form.image.filename, await form.image.read(), form.image.content_type)
+    }
+
+    response = requests.post(
+        "http://127.0.0.1:8000/assistant/add",
+        data=form.model_dump(),
+        files=files  # type: ignore
+    )
+    print(response.json())
+    if response.status_code == status.HTTP_201_CREATED:
+        return "/login"
