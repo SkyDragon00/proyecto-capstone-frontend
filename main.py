@@ -1,11 +1,14 @@
+import tempfile
 from typing import Annotated
-from fastapi import FastAPI, Form, Request, status
-from fastapi.responses import HTMLResponse, RedirectResponse
+from uuid import UUID
+from fastapi import FastAPI, Form, HTTPException, Path, Request, UploadFile, status
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import httpx
 import requests
 
+from config import SettingsDependency
 from models.models import LoginForm, SignupForm
 
 app = FastAPI()
@@ -21,7 +24,7 @@ templates = Jinja2Templates(directory="templates")
     response_class=HTMLResponse,
     summary="Endpoint to retrieve the home page"
 )
-async def home(request: Request):
+async def home(request: Request, settings: SettingsDependency):
     """Endpoint to retrieve the home page with upcoming events.
 
     \f
@@ -33,7 +36,7 @@ async def home(request: Request):
     """
 
     async with httpx.AsyncClient() as client:
-        response = await client.get("http://127.0.0.1:8000/events/upcoming?quantity=3")
+        response = await client.get(f"{settings.API_URL}/events/upcoming?quantity=3")
 
     events = response.json()
 
@@ -45,8 +48,67 @@ async def home(request: Request):
         name="index.html.j2",
         context={
             "request": request,
-            "events": events
+            "events": events,
+            "api_url": settings.API_URL
         }
+    )
+
+
+@app.get(
+    "/event/image/{image_uuid}",
+    response_class=FileResponse,
+    summary="Endpoint to retrieve the event image",
+    response_description="Successful Response with the event image",
+)
+async def get_event_image(
+    image_uuid: Annotated[
+        UUID,
+        Path(
+            title="Image UUID",
+            description="The UUID of the event image to retrieve",
+        )
+    ],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the event image.
+
+    \f
+
+    :param image_uuid: UUID of the event image to retrieve.
+    :type image_uuid: UUID
+    :param settings: SettingsDependency object containing the API URL.
+    :type settings: SettingsDependency
+    :return: FileResponse object containing the event image.
+    :rtype: FileResponse
+    """
+
+    response = requests.get(f"{settings.API_URL}/events/image/{image_uuid}")
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail="Failed to retrieve the image"
+        )
+
+    # Guardar la imagen en un archivo temporal
+    content_type = response.headers.get("Content-Type", "")
+    suffix = ".png"
+    # Puedes agregar más tipos si lo necesitas
+
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    temp_file.write(response.content)
+    temp_file.close()
+
+    filename = "image"
+    content_disp = response.headers.get("Content-Disposition")
+    if content_disp and "filename=" in content_disp:
+        filename = content_disp.split("filename=")[1].strip('"')
+
+    return FileResponse(
+        temp_file.name,
+        media_type=content_type,
+        filename=filename,
+        headers={"X-Accel-Buffering": "no"}
     )
 
 
@@ -82,7 +144,8 @@ def login(request: Request):
     status_code=status.HTTP_303_SEE_OTHER
 )
 def handle_login(
-    form: Annotated[LoginForm, Form()]
+    form: Annotated[LoginForm, Form()],
+    settings: SettingsDependency
 ):
     """Endpoint to handle login form submission.
 
@@ -95,7 +158,7 @@ def handle_login(
     """
 
     response = requests.post(
-        "http://127.0.0.1:8000/token",
+        f"{settings.API_URL}/token",
         data=form.model_dump()
     )
 
@@ -146,6 +209,7 @@ async def handle_signup(
             media_type="multipart/form-data",
         )
     ],
+    settings: SettingsDependency
 ):
     """Endpoint to handle signup form submission.
 
@@ -162,10 +226,79 @@ async def handle_signup(
     }
 
     response = requests.post(
-        "http://127.0.0.1:8000/assistant/add",
+        f"{settings.API_URL}/assistant/add",
         data=form.model_dump(),
         files=files  # type: ignore
     )
     print(response.json())
     if response.status_code == status.HTTP_201_CREATED:
         return "/login"
+
+
+@app.get(
+    "/record-assistant",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the record assistant page"
+)
+async def record_assistant(
+    request: Request,
+):
+    """Endpoint to retrieve the record assistant page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="record_assistant.html.j2",
+        context={
+            "request": request
+        }
+    )
+
+
+@app.post(
+    "/record-assistant",
+    response_class=HTMLResponse,
+)
+async def record_assistant_with_data(
+    request: Request,
+    image: Annotated[UploadFile, Form()],
+    settings: SettingsDependency,
+):
+    """Endpoint to handle the recording of an assistant.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param image: Image file uploaded by the user.
+    :type image: UploadFile
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    file = {
+        "image": (image.filename, await image.read(), image.content_type)
+    }
+
+    response = requests.post(
+        f"{settings.API_URL}/assistant/get-by-image",
+        files=file  # type: ignore
+    )
+
+    assistants = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="record_assistant.html.j2",
+        context={
+            "request": request,
+            "assistants": assistants,
+            "api_url": settings.API_URL
+        }
+    )

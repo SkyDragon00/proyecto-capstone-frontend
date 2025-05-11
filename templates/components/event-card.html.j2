@@ -1,6 +1,7 @@
 <article class="event-card card" tabindex="0">
     <figure>
-        <img src="{{ url_for('static', path='imgs/evento1.jpg') }}" alt="Foto Promocional del {{ event.name }}">
+        <img src="{{ url_for('get_event_image', image_uuid=event.image_uuid) }}"
+            alt="Foto Promocional del {{ event.name }}">
         <figcaption>Foto Promocional del {{ event.name }}</figcaption>
     </figure>
 

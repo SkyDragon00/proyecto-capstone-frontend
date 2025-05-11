@@ -1,3 +1,4 @@
 {
-    "python.analysis.supportDocstringTemplate": true
+    "python.analysis.supportDocstringTemplate": true,
+    "python.envFile": "${workspaceFolder}/.env",
 }

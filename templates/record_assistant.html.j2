@@ -1,0 +1,150 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Registrar Asistencia{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/record-assistant-style.css') }}" />
+{% endblock head %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<div class="flex-center">
+    <div id="capture-container">
+        <form method="post" action="/record-assistant" id="capture-form" enctype="multipart/form-data">
+            <input type="file" id="image" name="image" accept="image/*" required placeholder="Selecciona una imagen"
+                style="display: none;">
+            <!-- <img id="preview" /> --> <!-- Eliminado -->
+            <canvas id="canvas" width="500" height="400" style="display:none;"></canvas>
+            <video id="video" width="500" height="400" autoplay style="display:block;"></video>
+            <button id="capture" type="button" class="a-button-filled-red" style="--display: flex;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-camera-up">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path
+                        d="M12 20h-7a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v3.5" />
+                    <path d="M12 16a3 3 0 1 0 0 -6a3 3 0 0 0 0 6z" />
+                    <path d="M19 22v-6" />
+                    <path d="M22 19l-3 -3l-3 3" />
+                </svg>
+                &nbsp;&nbsp;Capturar foto
+            </button>
+            <button id="switch-camera" type="button" class="a-button-outline-red" style="margin-top: 10px;">
+                Cambiar cámara
+            </button>
+        </form>
+    </div>
+
+    <div id="assistant-list">
+        {% if assistants|length >= 1 %}
+        <ul id="assistant-list-items">
+            {% for assistant in assistants %}
+            <li class="flex-center">
+                <div class="flex-center assistant-image">
+                    <img src="{{ api_url }}/assistant/image/{{ assistant.assistant.image_uuid }}"
+                        alt="Imagen de {{ assistant.first_name }} {{ assistant.last_name }}"><br>
+                </div>
+                <div class="assistant-info">
+                    Nombre: {{ assistant.first_name }} {{ assistant.last_name }}<br>
+                    Email: {{ assistant.email }}<br>
+                    Identificación: {{ assistant.assistant.id_number }}<br>
+                    Teléfono: {{ assistant.assistant.phone }}<br>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {# Else #}
+        {% else %}
+        <p>No hay asistentes registrados.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock main %}
+
+{% block scripts%}
+<script>
+    let stream = null;
+    let videoDevices = [];
+    let currentDeviceIndex = 0;
+
+    async function getVideoDevices() {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        videoDevices = devices.filter(device => device.kind === 'videoinput');
+    }
+
+    async function startCamera(deviceId = null) {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        const constraints = {
+            video: deviceId ? { deviceId: { exact: deviceId } } : true
+        };
+        try {
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            const video = document.getElementById('video');
+            video.srcObject = stream;
+            video.style.display = 'block';
+            // Guarda el deviceId seleccionado en localStorage
+            if (deviceId) {
+                localStorage.setItem('preferredCamera', deviceId);
+            }
+        } catch (err) {
+            alert('No se pudo acceder a la cámara: ' + err.message);
+        }
+    }
+
+    window.onload = async function () {
+        await getVideoDevices();
+        // Intenta usar la cámara guardada en localStorage
+        const preferredCamera = localStorage.getItem('preferredCamera');
+        if (preferredCamera) {
+            const index = videoDevices.findIndex(device => device.deviceId === preferredCamera);
+            if (index !== -1) {
+                currentDeviceIndex = index;
+                await startCamera(preferredCamera);
+                return;
+            }
+        }
+        if (videoDevices.length > 0) {
+            await startCamera(videoDevices[currentDeviceIndex].deviceId);
+        } else {
+            alert('No se detectaron cámaras.');
+        }
+    };
+
+    document.getElementById('switch-camera').onclick = async function () {
+        if (videoDevices.length <= 1) {
+            alert('No hay más de una cámara conectada.');
+            return;
+        }
+        currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
+        const deviceId = videoDevices[currentDeviceIndex].deviceId;
+        await startCamera(deviceId);
+    };
+
+    document.getElementById('capture').onclick = function () {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => {
+            const file = new File([blob], "captura.png", { type: "image/png" });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            document.getElementById('image').files = dataTransfer.files;
+            document.getElementById('capture-form').submit();
+        }, 'image/png');
+    };
+</script>
+{% endblock scripts %}
