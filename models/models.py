@@ -24,7 +24,7 @@ class LoginForm(BaseModel):
     username: str
     password: str
     grant_type: str
-    scope: str
+    scope: str | None = None
 
 
 # Model for the signup form

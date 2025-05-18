@@ -1,7 +1,7 @@
 import tempfile
 from typing import Annotated
 from uuid import UUID
-from fastapi import FastAPI, Form, HTTPException, Path, Request, UploadFile, status
+from fastapi import Cookie, FastAPI, Form, HTTPException, Path, Request, UploadFile, status
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -48,8 +48,7 @@ async def home(request: Request, settings: SettingsDependency):
         name="index.html.j2",
         context={
             "request": request,
-            "events": events,
-            "api_url": settings.API_URL
+            "events": events
         }
     )
 
@@ -162,13 +161,35 @@ def handle_login(
         data=form.model_dump()
     )
 
-    if response.status_code == status.HTTP_200_OK:
-        token = response.json().get("access_token")
-        # Store the token in a session or cookie as needed
-        # For example, using a cookie:
-        response = RedirectResponse(url="/home")
-        response.set_cookie(key="access_token", value=token, httponly=True)
-        return response
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail="Credenciales inválidas"
+        )
+
+    print(response.json())
+    token = response.json().get("access_token")
+    # Obtener información del usuario usando el token
+    user_response = requests.get(
+        f"{settings.API_URL}/info",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    if user_response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=user_response.status_code,
+            detail="No se pudo obtener la información del usuario"
+        )
+
+    user_data = user_response.json()
+    role = user_data.get("role")
+
+    response = RedirectResponse(
+        url="/home", status_code=status.HTTP_303_SEE_OTHER)
+    response.set_cookie(key="access_token", value=token,
+                        httponly=True, secure=True)
+    response.set_cookie(key="role", value=role, httponly=True)
+    return response
 
 
 @app.get(
@@ -242,6 +263,7 @@ async def handle_signup(
 )
 async def record_assistant(
     request: Request,
+    role: Annotated[str, Cookie()]
 ):
     """Endpoint to retrieve the record assistant page.
 
