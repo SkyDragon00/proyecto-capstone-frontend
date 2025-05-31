@@ -21,7 +21,8 @@
 {% block main %}
 <div class="flex-center">
     <div id="capture-container">
-        <form method="post" action="/record-assistant" id="capture-form" enctype="multipart/form-data">
+        <form method="post" action="/record-assistant/{{ event_id }}/{{ event_date_id }}" id="capture-form"
+            enctype="multipart/form-data">
             <input type="file" id="image" name="image" accept="image/*" required placeholder="Selecciona una imagen"
                 style="display: none;">
             <!-- <img id="preview" /> --> <!-- Eliminado -->
@@ -61,6 +62,11 @@
                     Identificación: {{ assistant.assistant.id_number }}<br>
                     Teléfono: {{ assistant.assistant.phone }}<br>
                 </div>
+                {# <a href="#" class="a-button-filled-red">Registrar Asistencia</a> #}
+                <button class="a-button-filled-red"
+                    onclick="sendAttendance({{ event_date_id }}, {{ event_id }}, {{ assistant.id }})">
+                    Registrar Asistencia
+                </button>
             </li>
             {% endfor %}
         </ul>
@@ -147,4 +153,5 @@
         }, 'image/png');
     };
 </script>
+<script src="{{ url_for('static', path='js/record_assistant.js') }}"></script>
 {% endblock scripts %}

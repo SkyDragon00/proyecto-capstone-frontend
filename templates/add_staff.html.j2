@@ -1,32 +1,29 @@
-from pydantic import BaseModel, EmailStr
-from pydantic import BaseModel
+{% extends "base.html.j2" %}
 
+{% block title %}Log In{% endblock title %}
 
-class LoginForm(BaseModel):
-    """Class representing the login form data.
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
+{% endblock head %}
 
-    \f
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
 
-    :param username: Username of the user.
-    :type username: str
+{% block main %}
+<video autoplay loop muted playsinline id="bg-video">
+    <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+</video>
 
-    :param password: Password of the user.
-    :type password: str
-
-    :param grant_type: Grant type for the OAuth2 token request.
-    :type grant_type: str
-
-    :param scope: Scope for the OAuth2 token request.
-    :type scope: str
-    """
-    username: str
-    password: str
-    grant_type: str
-    scope: str | None = None
-
-
-# Model for the signup form
-"""
 <div class="login-container">
     <div class="login-form">
         <div class="login-header">
@@ -46,7 +43,7 @@ class LoginForm(BaseModel):
 
         </div>
 
-        <form method="post" action="/signup" id="login-form" enctype="multipart/form-data">
+        <form method="post" action="/create-staff" id="login-form" enctype="multipart/form-data">
             <div class="input-group">
                 <div>
                     <label for="first_name">Nombre:</label>
@@ -71,31 +68,4 @@ class LoginForm(BaseModel):
         </form>
     </div>
 </div>
-"""
-
-
-class Staff(BaseModel):
-    """Class representing a staff member.
-
-    \f
-
-    :param first_name: First name of the staff member.
-    :type first_name: str
-
-    :param last_name: Last name of the staff member.
-    :type last_name: str
-
-    :param email: Email address of the staff member.
-    :type email: EmailStr
-
-    :param password: Password of the staff member.
-    :type password: str
-
-    :param confirm_password: Confirm password for verification.
-    :type confirm_password: str
-    """
-    first_name: str
-    last_name: str
-    email: EmailStr
-    password: str
-    confirm_password: str
+{% endblock main %}

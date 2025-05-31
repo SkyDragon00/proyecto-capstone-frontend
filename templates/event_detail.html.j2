@@ -1,0 +1,54 @@
+{% extends "base.html.j2" %}
+
+{% block title %}{{ event.name }}{% endblock title %}
+
+{% block header_nav %}
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<figure>
+    <img src="{{ url_for('get_event_image', image_uuid=event.image_uuid) }}" alt="Foto Promocional del {{ event.name }}"
+        width="100%">
+    <figcaption>Foto Promocional del {{ event.name }}</figcaption>
+</figure>
+<div class=" event-card-datetime flex-center">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-smile">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
+            d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12zm12 -4v4m-8 -4v4m-4 4h16m-9.995 3h.01m3.99 0h.01" />
+        <path d="M10.005 17a3.5 3.5 0 0 0 4 0" />
+    </svg>&nbsp;
+    <time datetime="{{ event.event_dates[0].day_date }}">
+        {{ event.event_dates[0].day_date }} • {{ event.event_dates[0].start_time }}
+    </time>
+</div>
+
+<h1>{{ event.name }}</h1>
+<p class="event-card-description">
+    {{ event.description }}
+</p>
+<p>
+    {{ event.location }}
+</p>
+<a href="{{ event.maps_link }}" class="link">
+    Ver en el mapa
+</a>
+
+{% if not event.id in registered_events_ids %}
+<a href="/register-to/{{ event.id }}" class="a-button-outline-red">
+    Registrarse
+</a>
+{% else %}
+<a href="/unregister-to/{{ event.id }}" class="a-button-outline-red">
+    Cancelar Inscripción
+</a>
+{% endif %}
+{% endblock main %}

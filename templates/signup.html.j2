@@ -43,7 +43,7 @@
 
         </div>
 
-        <form method="post" action="/signup" id="login-form" enctype="multipart/form-data">
+        <form id="login-form" enctype="multipart/form-data">
             <div class="input-group">
                 <div>
                     <label for="first_name">Nombre:</label>
@@ -181,4 +181,5 @@
         }
     };
 </script>
+<script src="{{ url_for('static', path='js/signup.js') }}"></script>
 {% endblock scripts %}

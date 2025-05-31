@@ -1,0 +1,28 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Perfil{% endblock title %}
+
+{% block header_nav %}
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<p>{{ user.first_name }} {{ user.last_name }}</p>
+<p>{{ user.email }}</p>
+<p>{{ user.role }}</p>
+
+{% if user.role == 'assistant' %}
+<p>{{ user.assistant.id_number }}</p>
+<p>{{ user.assistant.phone }}</p>
+<p>{{ user.assistant.gender }}</p>
+<p>{{ user.assistant.date_of_birth }}</p>
+<img src="{{ api_url }}/assistant/image/{{ user.assistant.image_uuid }}"
+    alt="Imagen de {{ user.first_name }} {{ user.last_name }}"><br>
+{% endif %}
+
+{% endblock main %}
