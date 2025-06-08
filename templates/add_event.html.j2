@@ -1,0 +1,75 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Crear Evento{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
+{% endblock head %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="/events">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<video autoplay loop muted playsinline id="bg-video">
+    <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+</video>
+
+<div class="login-container">
+    <div class="login-form">
+        <div class="login-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-plus">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" />
+                <path d="M16 3v4" />
+                <path d="M8 3v4" />
+                <path d="M4 11h16" />
+                <path d="M16 19h6" />
+                <path d="M19 16v6" />
+            </svg>
+            <h1>Crear Nuevo Evento</h1>
+        </div>
+
+        <form method="post" action="/create-event" id="event-form" enctype="multipart/form-data">
+            <label for="name">Nombre del Evento:</label>
+            <input type="text" id="name" name="name" required placeholder="Nombre del Evento">
+
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" rows="3" required
+                placeholder="Descripción detallada del evento"></textarea>
+
+            <label for="location">Ubicación:</label>
+            <input type="text" id="location" name="location" required placeholder="Lugar del evento">
+
+            <label for="maps_link">Enlace de Google Maps:</label>
+            <input type="url" id="maps_link" name="maps_link" placeholder="https://maps.app.goo.gl/xxxx">
+
+            <label for="capacity">Capacidad Máxima:</label>
+            <input type="number" id="capacity" name="capacity" required placeholder="Ej: 100" min="1">
+
+            <label for="capacity_type">Tipo de Capacidad:</label>
+            <select id="capacity_type" name="capacity_type" required>
+                <option value="" disabled selected>Seleccione un tipo</option>
+                <option value="limit_of_spaces">Límite de cupos</option>
+                <option value="site_capacity">Capacidad del sitio</option>
+            </select>
+
+            <label for="image">Imagen del Evento:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+
+            <button type="submit" class="a-button-filled-red">Crear Evento</button>
+        </form>
+    </div>
+</div>
+{% endblock main %}

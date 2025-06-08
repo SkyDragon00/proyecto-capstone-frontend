@@ -1,7 +1,7 @@
 import tempfile
 from typing import Annotated
 from uuid import UUID
-from fastapi import Cookie, FastAPI, Form, HTTPException, Path, Request, UploadFile, status
+from fastapi import Cookie, FastAPI, Form, HTTPException, Path, Request, UploadFile, File, status
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -687,6 +687,83 @@ async def handle_create_staff(
 
 
 @app.get(
+    "/create-organizer",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the create organizer page"
+)
+async def create_organizer(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the create organizer page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_organizer.html.j2",
+        context={
+            "request": request,
+        }
+    )
+
+
+@app.post(
+    "/create-organizer",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle create organizer form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_create_organizer(
+    form: Annotated[
+        Staff,
+        Form()
+    ],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to handle create organizer form submission.
+
+    \f
+
+    :param form: Staff object containing the form data.
+    :type form: Staff
+    :return: Redirect response to the home page.
+    :rtype: RedirectResponse
+    """
+
+    response = requests.post(
+        f"{settings.API_URL}/organizer/add",
+        headers={"Authorization": f"Bearer {access_token}"},
+        data=form.model_dump()
+    )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_201_CREATED:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return RedirectResponse(
+        url="/home",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
     "/logout",
     response_class=RedirectResponse,
     summary="Endpoint to handle logout",
@@ -706,3 +783,110 @@ async def logout():
     response.delete_cookie(key="access_token")
     response.delete_cookie(key="role")
     return response
+
+
+@app.get(
+    "/create-event",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the create event page"
+)
+async def create_event_page(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the create event page.
+
+    \\f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    # Check if the user is an organizer
+    # This is a placeholder, replace with actual logic to check user role
+    # For example, decode the access_token or call an API endpoint
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_event.html.j2",
+        context={
+            "request": request,
+        }
+    )
+
+
+@app.post(
+    "/create-event",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle create event form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_create_event(
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency,
+    name: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    location: Annotated[str, Form()],
+    maps_link: Annotated[str, Form()],
+    capacity: Annotated[int, Form()],
+    capacity_type: Annotated[str, Form()],
+    image: Annotated[UploadFile, File()]
+):
+    """Endpoint to handle create event form submission.
+
+    \\f
+
+    :param name: Event name.
+    :type name: str
+    :param description: Event description.
+    :type description: str
+    :param location: Event location.
+    :type location: str
+    :param maps_link: Event maps link.
+    :type maps_link: str
+    :param capacity: Event maximum capacity.
+    :type capacity: int
+    :param capacity_type: Type of capacity for the event.
+    :type capacity_type: str
+    :param image: Path to event image.
+    :type image: UploadFile
+    :return: Redirect response to the events page.
+    :rtype: RedirectResponse
+    """
+    event_data = {
+        "name": name,
+        "description": description,
+        "location": location,
+        "maps_link": maps_link,
+        "capacity": capacity,
+        "capacity_type": capacity_type,
+    }
+    files = {"image": (image.filename, image.file, image.content_type)}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{settings.API_URL}/events/add",
+            headers={"Authorization": f"Bearer {access_token}"},
+            data=event_data,
+            files=files
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_201_CREATED:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return RedirectResponse(
+        url="/events",  # Or perhaps a detail page for the newly created event
+        status_code=status.HTTP_303_SEE_OTHER
+    )
