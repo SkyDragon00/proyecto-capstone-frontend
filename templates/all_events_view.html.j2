@@ -1,0 +1,72 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Todos los eventos{% endblock title %}
+
+{% block head %}
+{#
+<link rel="stylesheet" href="{{ url_for('static', path='css/.css') }}" /> #}
+{% endblock head %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<table>
+    {# "name": "Evento 1: Festival de Colores",
+    "description": "Nihilne te nocturnum praesidium Palati, nihil urbis vigiliae. Salutantibus vitae elit libero, a
+    pharetra augue. Quam diu etiam furor iste tuus nos eludet? Fabio vel iudice vincam, sunt in culpa qui officia. Quam
+    temere in vitiis, legem sancimus haerentia. Quisque ut dolor gravida, placerat libero vel, euismod.",
+    "location": "UDLA Park",
+    "maps_link": "https://maps.app.goo.gl/HRVuKLLsgBxyCNZL8",
+    "capacity": 2000,
+    "capacity_type": "limit_of_spaces",
+    "created_at": "2025-05-15T23:10:07",
+    "is_cancelled": false,
+    "id": 1,
+    "is_published": false, #}
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Ubicación</th>
+            <th>Enlace de Google Maps</th>
+            <th>Capacidad</th>
+            <th>Fecha de Creación</th>
+            <th>Publicado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in events %}
+        <tr>
+            <td>{{ event.id }}</td>
+            <td>{{ event.name }}</td>
+            <td>{{ event.description }}</td>
+            <td>{{ event.location }}</td>
+            <td><a href="{{ event.maps_link }}" target="_blank">Ver en Maps</a></td>
+            <td>{{ event.capacity }}</td>
+            <td>{{ event.created_at|strftime }}</td>
+            <td>{{ 'Sí' if event.is_published else 'No' }}</td>
+            <td>
+                <a href="/edit-event/{{ event.id }}">Editar</a> |
+                <button onclick="deleteEvent({{ event.id }})">Eliminar</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock main %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/event_operations.js') }}"></script>
+{% endblock scripts %}

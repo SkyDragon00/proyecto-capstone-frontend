@@ -10,6 +10,7 @@ import requests
 
 from config import SettingsDependency
 from models.models import LoginForm, Staff
+from datetime import datetime
 
 app = FastAPI()
 
@@ -17,6 +18,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 templates = Jinja2Templates(directory="templates")
+templates.env.filters["strftime"] = lambda date_str: (  # type: ignore
+    datetime.fromisoformat(date_str.replace(
+        'Z', '+00:00')).strftime('%d/%m/%Y %H:%M')
+)
 
 
 @app.get(
@@ -889,4 +894,41 @@ async def handle_create_event(
     return RedirectResponse(
         url="/events",  # Or perhaps a detail page for the newly created event
         status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
+    "/all-events-view",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the all events view page"
+)
+async def all_events_view(
+    request: Request,
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the all events view page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{settings.API_URL}/events/all")
+
+    events = response.json()
+
+    if not events:
+        events = []
+
+    return templates.TemplateResponse(
+        request=request,
+        name="all_events_view.html.j2",
+        context={
+            "request": request,
+            "events": events
+        }
     )
