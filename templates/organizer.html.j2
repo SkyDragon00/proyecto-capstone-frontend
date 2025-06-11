@@ -1,0 +1,30 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Organizador{% endblock title %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<section class="upcoming-events">
+    <div class="flex-center justify-between">
+        <h2>Eventos organizados</h2>
+    </div>
+    <ul class="list-upcoming-events">
+        {% for event in events %}
+        <li>
+            {% include "./components/event-card.html.j2" %}
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock main %}

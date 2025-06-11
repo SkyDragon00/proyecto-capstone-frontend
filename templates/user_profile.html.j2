@@ -2,27 +2,61 @@
 
 {% block title %}Perfil{% endblock title %}
 
+{% block head %}
+  {{ super() }}
+  <!-- Asegúrate de cargar tu CSS de perfil -->
+  <link rel="stylesheet" href="{{ url_for('static', path='css/profile-style.css') }}" />
+{% endblock head %}
+
 {% block header_nav %}
-<li>
-    <a href="#">Eventos</a>
-</li>
-<li>
-    <a href="#">Contacto</a>
-</li>
+  <li><a href="#">Eventos</a></li>
+  <li><a href="#">Contacto</a></li>
 {% endblock header_nav %}
 
 {% block main %}
-<p>{{ user.first_name }} {{ user.last_name }}</p>
-<p>{{ user.email }}</p>
-<p>{{ user.role }}</p>
+<div class="profile-container">
+  <div class="profile-wrapper">
+    {# ————— Columna Avatar ————— #}
+    {% if user.role == 'assistant' %}
+    <div class="avatar-column">
+      <img
+        class="profile-avatar"
+        src="{{ api_url }}/assistant/image/{{ user.assistant.image_uuid }}"
+        alt="Avatar de {{ user.first_name }} {{ user.last_name }}"
+      >
+    </div>
+    {% endif %}
 
-{% if user.role == 'assistant' %}
-<p>{{ user.assistant.id_number }}</p>
-<p>{{ user.assistant.phone }}</p>
-<p>{{ user.assistant.gender }}</p>
-<p>{{ user.assistant.date_of_birth }}</p>
-<img src="{{ api_url }}/assistant/image/{{ user.assistant.image_uuid }}"
-    alt="Imagen de {{ user.first_name }} {{ user.last_name }}"><br>
-{% endif %}
+    {# ————— Columna Datos ————— #}
+    <div class="info-column">
+      <div class="info-card">
+        <strong>Usuario:</strong> {{ user.username }}
+      </div>
+      <div class="info-card">
+        <strong>Nombre:</strong> {{ user.first_name }} {{ user.last_name }}
+      </div>
+      <div class="info-card">
+        <strong>Email:</strong> {{ user.email }}
+      </div>
+      <div class="info-card">
+        <strong>Rol:</strong> {{ user.role }}
+      </div>
 
+      {% if user.role == 'assistant' %}
+      <div class="info-card">
+        <strong>Cédula:</strong> {{ user.assistant.id_number }}
+      </div>
+      <div class="info-card">
+        <strong>Teléfono:</strong> {{ user.assistant.phone }}
+      </div>
+      <div class="info-card">
+        <strong>Género:</strong> {{ user.assistant.gender }}
+      </div>
+      <div class="info-card">
+        <strong>F. Nac.:</strong> {{ user.assistant.date_of_birth }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock main %}

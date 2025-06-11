@@ -431,6 +431,11 @@ async def event_detail(
             headers={"Authorization": f"Bearer {access_token}"}
         )
 
+        user_response = await client.get(
+            f"{settings.API_URL}/info",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
     registered_events_ids = []
 
     for registered_event in response.json():
@@ -438,13 +443,18 @@ async def event_detail(
             registered_event["event_id"]
         )
 
+    role = None
+    if user_response.status_code == status.HTTP_200_OK:
+        role = user_response.json().get("role")
+
     return templates.TemplateResponse(
         request=request,
         name="event_detail.html.j2",
         context={
             "request": request,
             "event": event,
-            "registered_events_ids": registered_events_ids
+            "registered_events_ids": registered_events_ids,
+            "role": role
         }
     )
 
@@ -706,3 +716,33 @@ async def logout():
     response.delete_cookie(key="access_token")
     response.delete_cookie(key="role")
     return response
+
+
+@app.get(
+    "/organizer",
+    response_class=HTMLResponse,
+    summary="Página del organizador con sus eventos"
+)
+async def organizer(
+    request: Request,
+    access_token: Annotated[str, Cookie()] = None,
+    settings: SettingsDependency = None
+):
+    """Página del organizador con sus eventos."""
+    # Aquí podrías cambiar el endpoint si tienes uno específico para eventos organizados por el usuario
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/upcoming",
+            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+        )
+    events = response.json()
+    if not events:
+        events = []
+    return templates.TemplateResponse(
+        request=request,
+        name="organizer.html.j2",
+        context={
+            "request": request,
+            "events": events
+        }
+    )

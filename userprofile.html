@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .profile-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+        }
+        .profile-pic {
+            border: 6px solid #fff;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        .profile-pic:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .info-card {
+            transition: all 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .gender-male {
+            border-left: 4px solid #3b82f6;
+        }
+        .gender-female {
+            border-left: 4px solid #ec4899;
+        }
+        .gender-other {
+            border-left: 4px solid #10b981;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-100 to-blue-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-5xl w-full">
+        <div class="profile-card bg-white/80 p-6 md:p-8 overflow-hidden">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">User Profile Dashboard</h1>
+                <div class="flex items-center space-x-2 mt-4 md:mt-0">
+                    <span id="current-date" class="text-gray-600 text-sm"></span>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Left Column -->
+                <div class="w-full lg:w-1/3 flex flex-col items-center">
+                    <div class="relative mb-6">
+                        <img id="user-photo" 
+                             src="https://randomuser.me/api/portraits/men/32.jpg" 
+                             alt="User photo" 
+                             class="profile-pic w-60 h-60 rounded-full object-cover">
+                        <button class="absolute bottom-3 right-3 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    
+                    <h2 id="user-name" class="text-2xl font-bold text-gray-800 mb-1">John Doe</h2>
+                    <p class="text-gray-500 mb-4">UI/UX Designer</p>
+                    
+                </div>
+                
+                <!-- Right Column -->
+                <div class="w-full lg:w-2/3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- User ID Card -->
+                        <div class="info-card bg-white p-5 rounded-lg shadow-sm flex items-center">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-id-card text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">User ID</p>
+                                <p id="user-id" class="font-semibold text-gray-800">U-5738294</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Card -->
+                        <div class="info-card bg-white p-5 rounded-lg shadow-sm flex items-center">
+                            <div class="bg-purple-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-envelope text-purple-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Email</p>
+                                <p id="user-email" class="font-semibold text-gray-800">johndoe@example.com</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Phone Card -->
+                        <div class="info-card bg-white p-5 rounded-lg shadow-sm flex items-center">
+                            <div class="bg-green-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-phone text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Phone</p>
+                                <p id="user-phone" class="font-semibold text-gray-800">+1 (555) 123-4567</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Role Card -->
+                        <div class="info-card bg-white p-5 rounded-lg shadow-sm flex items-center">
+                            <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-briefcase text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Role</p>
+                                <p id="user-role" class="font-semibold text-gray-800">Senior Designer</p>
+                            </div>
+                        </div>
+
+                        <!-- Birthday Card -->
+                        <div class="info-card bg-white p-5 rounded-lg shadow-sm flex items-center">
+                            <div class="bg-red-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-birthday-cake text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Date of Birth</p>
+                                <p id="user-birthday" class="font-semibold text-gray-800">February 14, 1990 (33 years)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gender Card Section -->
+                    <div class="space-y-4">
+                        <div id="gender-card" class="gender-male info-card bg-white p-5 rounded-lg shadow-sm">
+                            <div class="flex items-center">
+                                <div class="bg-pink-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-venus-mars text-pink-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 text-sm">Gender</p>
+                                    <p id="user-gender" class="font-semibold text-gray-800">Male</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Sample user data (in a real app, this would come from an API)
+            const user = {
+                name: "John M. Carter",
+                id: "U-5738294",
+                email: "john.carter@example.com",
+                phone: "+1 (555) 987-6543",
+                gender: "male",
+                role: "Lead UI/UX Designer",
+                birthday: "August 21, 1988",
+                yearsOld: calculateAge("1988-08-21"),
+                photo: "https://randomuser.me/api/portraits/men/75.jpg"
+            };
+            
+            // Update user info
+            document.getElementById('user-name').textContent = user.name;
+            document.getElementById('user-id').textContent = user.id;
+            document.getElementById('user-email').textContent = user.email;
+            document.getElementById('user-phone').textContent = user.phone;
+            document.getElementById('user-role').textContent = user.role;
+            document.getElementById('user-gender').textContent = capitalizeFirstLetter(user.gender);
+            document.getElementById('user-birthday').textContent = `${user.birthday} (${user.yearsOld} years)`;
+            document.getElementById('user-photo').src = user.photo;
+            
+            // Update gender card styling
+            const genderCard = document.getElementById('gender-card');
+            genderCard.className += ` gender-${user.gender}`;
+            
+            // Add animation on page load
+            const infoCards = document.querySelectorAll('.info-card');
+            infoCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transition = 'opacity 0.5s ease';
+                    card.offsetWidth; // Trigger reflow
+                    card.style.opacity = '1';
+                }, index * 100);
+            });
+        });
+        
+        function calculateAge(birthDate) {
+            const birthDt = new Date(birthDate);
+            const today = new Date();
+            let age = today.getFullYear() - birthDt.getFullYear();
+            const monthDiff = today.getMonth() - birthDt.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDt.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+        
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
+</body>
+</html>
