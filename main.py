@@ -746,3 +746,30 @@ async def organizer(
             "events": events
         }
     )
+
+
+@app.get(
+    "/staff",
+    response_class=HTMLResponse,
+    summary="Página de staff con todos los usuarios staff"
+)
+async def staff(
+    request: Request,
+    access_token: Annotated[str, Cookie()] = None,
+    settings: SettingsDependency = None
+):
+    """Página de staff con todos los usuarios staff."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/users/staff",
+            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+        )
+    organizers = response.json() if response.status_code == 200 else []
+    return templates.TemplateResponse(
+        request=request,
+        name="staff.html.j2",
+        context={
+            "request": request,
+            "organizers": organizers
+        }
+    )
