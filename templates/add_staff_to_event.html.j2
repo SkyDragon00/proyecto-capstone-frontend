@@ -1,0 +1,37 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Añadir un miembro al evento{% endblock title %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<label for="staff-emails">Selecciona un miembro del personal para añadir al evento:</label>
+<select id="staff-emails">
+    <option value="">Selecciona un miembro del personal</option>
+    {% for staff in staff_list %}
+    <option value="{{ staff.email }}">{{ staff.email }}</option>
+    {% endfor %}
+</select>
+
+<label for="event-id">Selecciona el evento:</label>
+<select id="event-id">
+    <option value="">Selecciona un evento</option>
+    {% for event in events %}
+    <option value="{{ event.id }}">{{ event.name }}</option>
+    {% endfor %}
+</select>
+<button id="add-staff-button">Añadir miembro al evento</button>
+{% endblock main %}
+
+{% block scripts %}
+{% endblock scripts %}

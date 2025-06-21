@@ -932,3 +932,211 @@ async def all_events_view(
             "events": events
         }
     )
+
+
+@app.get(
+    "/{event_id}/event-dates",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the event dates page"
+)
+async def event_dates_view(
+    request: Request,
+    event_id: int,
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the event dates page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to retrieve dates for.
+    :type event_id: int
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{settings.API_URL}/events/{event_id}/dates")
+
+    event_dates = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="event_dates_view.html.j2",
+        context={
+            "request": request,
+            "event_dates": event_dates,
+            "event_id": event_id,
+        }
+    )
+
+
+# /{{ event_id }}/create-date
+@app.get(
+    "/{event_id}/create-date",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the create event date page"
+)
+async def create_event_date_page(
+    request: Request,
+    event_id: int,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the create event date page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to create a date for.
+    :type event_id: int
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_event_date.html.j2",
+        context={
+            "request": request,
+            "event_id": event_id,
+        }
+    )
+
+
+@app.post(
+    "/{event_id}/create-date",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle create event date form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_create_event_date(
+    request: Request,
+    event_id: int,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency,
+    day_date: Annotated[str, Form()],
+    start_time: Annotated[str, Form()],
+    end_time: Annotated[str, Form()]
+):
+    """Endpoint to handle create event date form submission.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to create a date for.
+    :type event_id: int
+    :param day_date: Date of the event date.
+    :type day_date: str
+    :param start_time: Start time of the event date.
+    :type start_time: str
+    :param end_time: End time of the event date.
+    :type end_time: str
+    :return: Redirect response to the event dates page.
+    :rtype: RedirectResponse
+    """
+
+    data = {
+        "day_date": day_date,
+        "start_time": start_time,
+        "end_time": end_time,
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{settings.API_URL}/events/{event_id}/date/add",
+            headers={"Authorization": f"Bearer {access_token}"},
+            data=data
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_201_CREATED:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return RedirectResponse(
+        url=f"/{event_id}/event-dates",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
+    "/staff-to-event",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the add staff to event page"
+)
+async def add_staff_to_event_page(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the add staff to event page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    # Envía todos los staff al template y también todos los eventos
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/staff/all",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    staff = response.json()
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/upcoming",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    events = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_staff_to_event.html.j2",
+        context={
+            "request": request,
+            "staff_list": staff,
+            "events_list": events
+        }
+    )

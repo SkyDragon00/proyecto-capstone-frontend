@@ -20,19 +20,8 @@
 {% endblock header_nav %}
 
 {% block main %}
+<a href="/create-event" class="a-button-filled-red">Crear Evento</a>
 <table>
-    {# "name": "Evento 1: Festival de Colores",
-    "description": "Nihilne te nocturnum praesidium Palati, nihil urbis vigiliae. Salutantibus vitae elit libero, a
-    pharetra augue. Quam diu etiam furor iste tuus nos eludet? Fabio vel iudice vincam, sunt in culpa qui officia. Quam
-    temere in vitiis, legem sancimus haerentia. Quisque ut dolor gravida, placerat libero vel, euismod.",
-    "location": "UDLA Park",
-    "maps_link": "https://maps.app.goo.gl/HRVuKLLsgBxyCNZL8",
-    "capacity": 2000,
-    "capacity_type": "limit_of_spaces",
-    "created_at": "2025-05-15T23:10:07",
-    "is_cancelled": false,
-    "id": 1,
-    "is_published": false, #}
     <thead>
         <tr>
             <th>ID</th>
@@ -59,7 +48,8 @@
             <td>{{ 'Sí' if event.is_published else 'No' }}</td>
             <td>
                 <a href="/edit-event/{{ event.id }}">Editar</a> |
-                <button onclick="deleteEvent({{ event.id }})">Eliminar</button>
+                <button onclick="deleteEvent({{ event.id }})">Eliminar</button> |
+                <a href="/{{ event.id }}/event-dates">Ver Fechas</a>
             </td>
         </tr>
         {% endfor %}
