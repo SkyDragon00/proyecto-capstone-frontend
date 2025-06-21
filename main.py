@@ -718,6 +718,7 @@ async def logout():
     return response
 
 
+
 @app.get(
     "/organizer",
     response_class=HTMLResponse,
@@ -728,22 +729,24 @@ async def organizer(
     access_token: Annotated[str, Cookie()] = None,
     settings: SettingsDependency = None
 ):
-    """Página del organizador con sus eventos."""
-    # Aquí podrías cambiar el endpoint si tienes uno específico para eventos organizados por el usuario
+    """Página que muestra todos los usuarios organizadores."""
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            f"{settings.API_URL}/events/upcoming",
+            f"{settings.API_URL}/organizer", 
             headers={"Authorization": f"Bearer {access_token}"} if access_token else None
         )
-    events = response.json()
-    if not events:
-        events = []
+
+        response = await client.get(
+            f"{settings.API_URL}/organizer/all",
+            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+        )
+
+    organizers = response.json() or []
     return templates.TemplateResponse(
-        request=request,
-        name="organizer.html.j2",
-        context={
+        "organizer.html.j2",
+        {
             "request": request,
-            "events": events
+            "organizers": organizers
         }
     )
 
