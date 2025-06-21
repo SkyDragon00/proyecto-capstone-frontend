@@ -1,7 +1,7 @@
 import tempfile
 from typing import Annotated
 from uuid import UUID
-from fastapi import Cookie, FastAPI, Form, HTTPException, Path, Request, UploadFile, status
+from fastapi import Cookie, FastAPI, Form, HTTPException, Path, Request, UploadFile, File, status
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -10,6 +10,7 @@ import requests
 
 from config import SettingsDependency
 from models.models import LoginForm, Staff
+from datetime import datetime
 
 app = FastAPI()
 
@@ -17,6 +18,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 templates = Jinja2Templates(directory="templates")
+templates.env.filters["strftime"] = lambda date_str: (  # type: ignore
+    datetime.fromisoformat(date_str.replace(
+        'Z', '+00:00')).strftime('%d/%m/%Y %H:%M')
+)
 
 
 @app.get(
@@ -697,6 +702,83 @@ async def handle_create_staff(
 
 
 @app.get(
+    "/create-organizer",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the create organizer page"
+)
+async def create_organizer(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the create organizer page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_organizer.html.j2",
+        context={
+            "request": request,
+        }
+    )
+
+
+@app.post(
+    "/create-organizer",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle create organizer form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_create_organizer(
+    form: Annotated[
+        Staff,
+        Form()
+    ],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to handle create organizer form submission.
+
+    \f
+
+    :param form: Staff object containing the form data.
+    :type form: Staff
+    :return: Redirect response to the home page.
+    :rtype: RedirectResponse
+    """
+
+    response = requests.post(
+        f"{settings.API_URL}/organizer/add",
+        headers={"Authorization": f"Bearer {access_token}"},
+        data=form.model_dump()
+    )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_201_CREATED:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return RedirectResponse(
+        url="/home",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
     "/logout",
     response_class=RedirectResponse,
     summary="Endpoint to handle logout",
@@ -716,7 +798,6 @@ async def logout():
     response.delete_cookie(key="access_token")
     response.delete_cookie(key="role")
     return response
-
 
 
 @app.get(
@@ -752,6 +833,150 @@ async def organizer(
 
 
 @app.get(
+    "/create-event",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the create event page"
+)
+async def create_event_page(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the create event page.
+
+    \\f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    # Check if the user is an organizer
+    # This is a placeholder, replace with actual logic to check user role
+    # For example, decode the access_token or call an API endpoint
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_event.html.j2",
+        context={
+            "request": request,
+        }
+    )
+
+
+@app.post(
+    "/create-event",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle create event form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_create_event(
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency,
+    name: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    location: Annotated[str, Form()],
+    maps_link: Annotated[str, Form()],
+    capacity: Annotated[int, Form()],
+    capacity_type: Annotated[str, Form()],
+    image: Annotated[UploadFile, File()]
+):
+    """Endpoint to handle create event form submission.
+
+    \\f
+
+    :param name: Event name.
+    :type name: str
+    :param description: Event description.
+    :type description: str
+    :param location: Event location.
+    :type location: str
+    :param maps_link: Event maps link.
+    :type maps_link: str
+    :param capacity: Event maximum capacity.
+    :type capacity: int
+    :param capacity_type: Type of capacity for the event.
+    :type capacity_type: str
+    :param image: Path to event image.
+    :type image: UploadFile
+    :return: Redirect response to the events page.
+    :rtype: RedirectResponse
+    """
+    event_data = {
+        "name": name,
+        "description": description,
+        "location": location,
+        "maps_link": maps_link,
+        "capacity": capacity,
+        "capacity_type": capacity_type,
+    }
+    files = {"image": (image.filename, image.file, image.content_type)}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{settings.API_URL}/events/add",
+            headers={"Authorization": f"Bearer {access_token}"},
+            data=event_data,
+            files=files
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_201_CREATED:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return RedirectResponse(
+        url="/events",  # Or perhaps a detail page for the newly created event
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
+    "/all-events-view",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the all events view page"
+)
+async def all_events_view(
+    request: Request,
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the all events view page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{settings.API_URL}/events/all")
+
+    events = response.json()
+
+    if not events:
+        events = []
+
+    return templates.TemplateResponse(
+        request=request,
+        name="all_events_view.html.j2",
+        context={
+            "request": request,
+            "events": events
+        }
+    )
+
+
+@app.get(
     "/staff",
     response_class=HTMLResponse,
     summary="Página de staff con todos los usuarios staff"
@@ -774,5 +999,212 @@ async def staff(
         context={
             "request": request,
             "organizers": organizers
+        }
+    )
+  
+@app.get(
+    "/{event_id}/event-dates",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the event dates page"
+)
+async def event_dates_view(
+    request: Request,
+    event_id: int,
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the event dates page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to retrieve dates for.
+    :type event_id: int
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{settings.API_URL}/events/{event_id}/dates")
+
+    event_dates = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="event_dates_view.html.j2",
+        context={
+            "request": request,
+            "event_dates": event_dates,
+            "event_id": event_id,
+        }
+    )
+
+
+# /{{ event_id }}/create-date
+@app.get(
+    "/{event_id}/create-date",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the create event date page"
+)
+async def create_event_date_page(
+    request: Request,
+    event_id: int,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the create event date page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to create a date for.
+    :type event_id: int
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_event_date.html.j2",
+        context={
+            "request": request,
+            "event_id": event_id,
+        }
+    )
+
+
+@app.post(
+    "/{event_id}/create-date",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle create event date form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_create_event_date(
+    request: Request,
+    event_id: int,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency,
+    day_date: Annotated[str, Form()],
+    start_time: Annotated[str, Form()],
+    end_time: Annotated[str, Form()]
+):
+    """Endpoint to handle create event date form submission.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to create a date for.
+    :type event_id: int
+    :param day_date: Date of the event date.
+    :type day_date: str
+    :param start_time: Start time of the event date.
+    :type start_time: str
+    :param end_time: End time of the event date.
+    :type end_time: str
+    :return: Redirect response to the event dates page.
+    :rtype: RedirectResponse
+    """
+
+    data = {
+        "day_date": day_date,
+        "start_time": start_time,
+        "end_time": end_time,
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{settings.API_URL}/events/{event_id}/date/add",
+            headers={"Authorization": f"Bearer {access_token}"},
+            data=data
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_201_CREATED:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return RedirectResponse(
+        url=f"/{event_id}/event-dates",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
+    "/staff-to-event",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the add staff to event page"
+)
+async def add_staff_to_event_page(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the add staff to event page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    # Envía todos los staff al template y también todos los eventos
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/staff/all",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    staff = response.json()
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/upcoming",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    events = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_staff_to_event.html.j2",
+        context={
+            "request": request,
+            "staff_list": staff,
+            "events_list": events
         }
     )

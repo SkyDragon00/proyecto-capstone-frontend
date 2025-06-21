@@ -1,0 +1,58 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Crear Evento{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
+{% endblock head %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="/events">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<video autoplay loop muted playsinline id="bg-video">
+    <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+</video>
+
+<div class="login-container">
+    <div class="login-form">
+        <div class="login-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-plus">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" />
+                <path d="M16 3v4" />
+                <path d="M8 3v4" />
+                <path d="M4 11h16" />
+                <path d="M16 19h6" />
+                <path d="M19 16v6" />
+            </svg>
+            <h1>Crear Nuevo Evento</h1>
+        </div>
+
+        <form method="post" action="/{{ event_id }}/create-date" id="event-form" enctype="multipart/form-data">
+            <label for="day_date">Fecha del Evento:</label>
+            <input type="date" id="day_date" name="day_date" required placeholder="Fecha del Evento">
+
+            <label for="start_time">Hora de Inicio:</label>
+            <input type="time" id="start_time" name="start_time" required placeholder="Hora de Inicio">
+
+            <label for="end_time">Hora de Fin:</label>
+            <input type="time" id="end_time" name="end_time" required placeholder="Hora de Fin">
+
+            <button type="submit" class="a-button-filled-red">Crear Fecha</button>
+        </form>
+    </div>
+</div>
+{% endblock main %}
