@@ -436,6 +436,11 @@ async def event_detail(
             headers={"Authorization": f"Bearer {access_token}"}
         )
 
+        user_response = await client.get(
+            f"{settings.API_URL}/info",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
     registered_events_ids = []
 
     for registered_event in response.json():
@@ -443,13 +448,18 @@ async def event_detail(
             registered_event["event_id"]
         )
 
+    role = None
+    if user_response.status_code == status.HTTP_200_OK:
+        role = user_response.json().get("role")
+
     return templates.TemplateResponse(
         request=request,
         name="event_detail.html.j2",
         context={
             "request": request,
             "event": event,
-            "registered_events_ids": registered_events_ids
+            "registered_events_ids": registered_events_ids,
+            "role": role
         }
     )
 
@@ -791,6 +801,38 @@ async def logout():
 
 
 @app.get(
+    "/organizer",
+    response_class=HTMLResponse,
+    summary="Página del organizador con sus eventos"
+)
+async def organizer(
+    request: Request,
+    access_token: Annotated[str, Cookie()] = None,
+    settings: SettingsDependency = None
+):
+    """Página que muestra todos los usuarios organizadores."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/organizer", 
+            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+        )
+
+        response = await client.get(
+            f"{settings.API_URL}/organizer/all",
+            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+        )
+
+    organizers = response.json() or []
+    return templates.TemplateResponse(
+        "organizer.html.j2",
+        {
+            "request": request,
+            "organizers": organizers
+        }
+    )
+
+
+@app.get(
     "/create-event",
     response_class=HTMLResponse,
     summary="Endpoint to retrieve the create event page"
@@ -934,6 +976,32 @@ async def all_events_view(
     )
 
 
+@app.get(
+    "/staff",
+    response_class=HTMLResponse,
+    summary="Página de staff con todos los usuarios staff"
+)
+async def staff(
+    request: Request,
+    access_token: Annotated[str, Cookie()] = None,
+    settings: SettingsDependency = None
+):
+    """Página de staff con todos los usuarios staff."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/users/staff",
+            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+        )
+    organizers = response.json() if response.status_code == 200 else []
+    return templates.TemplateResponse(
+        request=request,
+        name="staff.html.j2",
+        context={
+            "request": request,
+            "organizers": organizers
+        }
+    )
+  
 @app.get(
     "/{event_id}/event-dates",
     response_class=HTMLResponse,

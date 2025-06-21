@@ -1,0 +1,97 @@
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* centra horizontal */
+  justify-content: center; /* centra vertical */
+  min-height: 100vh;       /* ocupa toda la altura de ventana */
+  padding: 20px;
+}
+
+/* envuelve la imagen y separa del resto */
+.avatar-wrapper {
+  margin-bottom: 1.5rem; /* espacio bajo la foto */
+}
+
+/* hace la imagen circular y ajusta tamaño */
+.profile-avatar {
+  width: 900px;
+  height: 900px;
+  border-radius: 50%;    /* círculo */
+  object-fit: cover;     /* recorta proporcionalmente */
+  border: 4px solid #c53030; /* borde rojo, ajústalo si quieres */
+}
+
+
+
+/* contenedor general */
+.profile-container {
+  padding: 2rem;
+}
+
+/* caja que alinea avatar + datos */
+.profile-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;    /* centra columnas horizontalmente */
+  align-items: flex-start;    /* alinea al tope */
+}
+
+/* columna del avatar */
+.avatar-column {
+  flex: 1 1 200px;            /* ocupa al menos 200px, crece si cabe */
+  display: flex;
+  justify-content: center;    /* centra la imagen dentro */
+}
+
+/* estilo del avatar */
+.profile-avatar {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;         /* círculo perfecto */
+  object-fit: cover;          /* recorta manteniendo proporción */
+  border: 4px solid #c53030;  /* borde rojo (ajústalo a tu paleta) */
+}
+
+/* columna de información */
+.info-column {
+  flex: 2 1 400px;            /* ocupa más espacio */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;                /* espacio entre tarjetas */
+}
+
+/* cada “tarjeta” de dato */
+.info-card {
+  background: rgba(255,255,255,0.8);
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.info-card .icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* efecto hover */
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
+.phone-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-weight: 600;
+}

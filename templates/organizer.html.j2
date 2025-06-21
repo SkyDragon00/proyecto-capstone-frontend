@@ -1,0 +1,32 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Organizador{% endblock title %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<section class="upcoming-events">
+    <div class="flex-center justify-between">
+        <h2>Usuarios Organizadores</h2>
+    </div>
+    <ul>
+        {% for organizer in organizers %}
+        <li>
+            {{ organizer.first_name }} {{ organizer.last_name }} - {{ organizer.email }}
+        </li>
+        {% else %}
+        <li>No hay organizadores registrados.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock main %}
