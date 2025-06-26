@@ -812,10 +812,7 @@ async def organizer(
 ):
     """Página que muestra todos los usuarios organizadores."""
     async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"{settings.API_URL}/organizer", 
-            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
-        )
+        response = await client.get(f"{settings.API_URL}/organizer", headers={"Authorization": f"Bearer {access_token}"} if access_token else None)
 
         response = await client.get(
             f"{settings.API_URL}/organizer/all",
@@ -1213,3 +1210,4 @@ async def add_staff_to_event_page(
             "events_list": events
         }
     )
+
