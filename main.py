@@ -1210,4 +1210,3 @@ async def add_staff_to_event_page(
             "events_list": events
         }
     )
-

@@ -32,3 +32,31 @@ function deleteOrganizer(organizerId) {
         alert("Error: " + error.message);
     });
 }
+
+
+document.getElementById("login-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    // Elimina el campo confirm_password antes de enviar
+    formData.delete("confirm_password");
+
+    fetch("/create-organizer", {
+        method: "POST",
+        body: formData,
+    })
+        .then((response) => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else if (!response.ok) {
+                return response.text().then((errorText) => {
+                    alert("Error en el registro: " + errorText);
+                });
+            }
+        })
+        .catch((err) => {
+            alert("Error de red: " + err.message);
+        });
+});
