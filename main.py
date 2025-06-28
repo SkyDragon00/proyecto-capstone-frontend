@@ -812,10 +812,7 @@ async def organizer(
 ):
     """Página que muestra todos los usuarios organizadores."""
     async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"{settings.API_URL}/organizer", 
-            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
-        )
+        response = await client.get(f"{settings.API_URL}/organizer", headers={"Authorization": f"Bearer {access_token}"} if access_token else None)
 
         response = await client.get(
             f"{settings.API_URL}/organizer/all",
@@ -990,6 +987,11 @@ async def staff(
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"{settings.API_URL}/users/staff",
+            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+        )
+
+        response = await client.get(
+            f"{settings.API_URL}/staff/all",
             headers={"Authorization": f"Bearer {access_token}"} if access_token else None
         )
     organizers = response.json() if response.status_code == 200 else []

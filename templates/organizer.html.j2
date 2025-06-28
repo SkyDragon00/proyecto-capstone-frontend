@@ -1,32 +1,52 @@
 {% extends "base.html.j2" %}
 
-{% block title %}Organizador{% endblock title %}
+{% block title %}Todos los organizadores{% endblock title %}
+
+{% block head %}
+{# aquí si necesitas CSS extra, lo descomentas #}
+{# <link rel="stylesheet" href="{{ url_for('static', path='css/organizers.css') }}" /> #}
+{% endblock head %}
 
 {% block header_nav %}
-<li>
-    <a href="/home">Home</a>
-</li>
-<li>
-    <a href="#">Eventos</a>
-</li>
-<li>
-    <a href="#">Contacto</a>
-</li>
+<li><a href="/home">Home</a></li>
+<li><a href="#">Eventos</a></li>
+<li><a href="#">Contacto</a></li>
 {% endblock header_nav %}
 
 {% block main %}
-<section class="upcoming-events">
-    <div class="flex-center justify-between">
-        <h2>Usuarios Organizadores</h2>
-    </div>
-    <ul>
-        {% for organizer in organizers %}
-        <li>
-            {{ organizer.first_name }} {{ organizer.last_name }} - {{ organizer.email }}
-        </li>
+<a href="/create-organizer" class="a-button-filled-red">Crear Organizador</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for org in organizers %}
+        <tr>
+            <td>{{ org.id }}</td>
+            <td>{{ org.first_name }}</td>
+            <td>{{ org.last_name }}</td>
+            <td>{{ org.email }}</td>
+            <td>
+                <a href="/edit-organizer/{{ org.id }}">Editar</a> |
+                <button onclick="deleteOrganizer({{ org.id }})">Eliminar</button>
+            </td>
+        </tr>
         {% else %}
-        <li>No hay organizadores registrados.</li>
+        <tr>
+            <td colspan="5">No hay organizadores registrados.</td>
+        </tr>
         {% endfor %}
-    </ul>
-</section>
+    </tbody>
+</table>
 {% endblock main %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/add_organizer.js') }}"></script>
+{% endblock scripts %}
