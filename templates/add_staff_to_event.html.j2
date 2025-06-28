@@ -15,23 +15,24 @@
 {% endblock header_nav %}
 
 {% block main %}
-<label for="staff-emails">Selecciona un miembro del personal para añadir al evento:</label>
-<select id="staff-emails">
+<label for="staff-id">Selecciona un miembro del personal para añadir al evento:</label>
+<select id="staff-id">
     <option value="">Selecciona un miembro del personal</option>
     {% for staff in staff_list %}
-    <option value="{{ staff.email }}">{{ staff.email }}</option>
+    <option value="{{ staff.id }}">{{ staff.email }}</option>
     {% endfor %}
 </select>
 
 <label for="event-id">Selecciona el evento:</label>
 <select id="event-id">
     <option value="">Selecciona un evento</option>
-    {% for event in events %}
+    {% for event in events_list %}
     <option value="{{ event.id }}">{{ event.name }}</option>
     {% endfor %}
 </select>
-<button id="add-staff-button">Añadir miembro al evento</button>
+<button id="add-staff-button" onclick="addStaffToEvent()">Añadir miembro al evento</button>
 {% endblock main %}
 
 {% block scripts %}
+<script src="{{ url_for('static', path='js/add_staff_to_event.js') }}"></script>
 {% endblock scripts %}

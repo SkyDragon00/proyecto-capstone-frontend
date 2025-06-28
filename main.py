@@ -459,7 +459,7 @@ async def event_detail(
             "request": request,
             "event": event,
             "registered_events_ids": registered_events_ids,
-            "role": role
+            "role": role,
         }
     )
 
@@ -813,13 +813,15 @@ async def organizer(
     """Página que muestra todos los usuarios organizadores."""
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            f"{settings.API_URL}/organizer", 
-            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+            f"{settings.API_URL}/organizer",
+            headers={
+                "Authorization": f"Bearer {access_token}"} if access_token else None
         )
 
         response = await client.get(
             f"{settings.API_URL}/organizer/all",
-            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+            headers={
+                "Authorization": f"Bearer {access_token}"} if access_token else None
         )
 
     organizers = response.json() or []
@@ -990,7 +992,8 @@ async def staff(
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"{settings.API_URL}/users/staff",
-            headers={"Authorization": f"Bearer {access_token}"} if access_token else None
+            headers={
+                "Authorization": f"Bearer {access_token}"} if access_token else None
         )
     organizers = response.json() if response.status_code == 200 else []
     return templates.TemplateResponse(
@@ -1001,7 +1004,8 @@ async def staff(
             "organizers": organizers
         }
     )
-  
+
+
 @app.get(
     "/{event_id}/event-dates",
     response_class=HTMLResponse,
