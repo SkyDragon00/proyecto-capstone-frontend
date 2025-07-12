@@ -99,3 +99,29 @@ class Staff(BaseModel):
     email: EmailStr
     password: str
     confirm_password: str
+
+class Organizer(BaseModel):
+    """Class representing a organizer member.
+
+    \f
+
+    :param first_name: First name of the staff member.
+    :type first_name: str
+
+    :param last_name: Last name of the staff member.
+    :type last_name: str
+
+    :param email: Email address of the staff member.
+    :type email: EmailStr
+
+    :param password: Password of the staff member.
+    :type password: str
+
+    :param confirm_password: Confirm password for verification.
+    :type confirm_password: str
+    """
+    first_name: str
+    last_name: str
+    email: EmailStr
+    password: str
+    confirm_password: str

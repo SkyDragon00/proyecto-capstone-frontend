@@ -1,4 +1,5 @@
 import tempfile
+import json
 from typing import Annotated
 from uuid import UUID
 from fastapi import Cookie, FastAPI, Form, HTTPException, Path, Request, UploadFile, File, status
@@ -708,8 +709,8 @@ async def handle_create_staff(
 )
 async def create_organizer(
     request: Request,
-    access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    access_token: Annotated[str, Cookie()] = None,
+    settings: SettingsDependency = None
 ):
     """Endpoint to retrieve the create organizer page.
 
@@ -737,28 +738,58 @@ async def create_organizer(
     status_code=status.HTTP_303_SEE_OTHER
 )
 async def handle_create_organizer(
-    form: Annotated[
-        Staff,
-        Form()
-    ],
-    access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    request: Request,
+    access_token: Annotated[str, Cookie()] = None,
+    settings: SettingsDependency = None
 ):
     """Endpoint to handle create organizer form submission.
 
     \f
 
-    :param form: Staff object containing the form data.
-    :type form: Staff
-    :return: Redirect response to the home page.
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: Redirect response to the organizer page.
     :rtype: RedirectResponse
     """
+    
+    # Obtener los datos del formulario manualmente
+    form_data = await request.form()
+        
+    first_name = form_data.get("first_name")
+    last_name = form_data.get("last_name")
+    email = form_data.get("email")
+    password = form_data.get("password")
+    confirm_password = form_data.get("confirm_password")
+    
+    # Validar que todos los campos estén presentes
+    if not all([first_name, last_name, email, password, confirm_password]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Todos los campos son requeridos"
+        )
+    
+    # Validar que las contraseñas coincidan
+    if password != confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Las contraseñas no coinciden"
+        )
 
-    response = requests.post(
-        f"{settings.API_URL}/organizer/add",
-        headers={"Authorization": f"Bearer {access_token}"},
-        data=form.model_dump()
-    )
+    # Crear el objeto de datos para enviar
+    organizer_data = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "email": email,
+        "password": password,
+        "confirm_password": confirm_password
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{settings.API_URL}/organizer/add",
+            headers={"Authorization": f"Bearer {access_token}"} if access_token else {},
+            data=organizer_data  # Cambio de json= a data=
+        )
 
     if response.status_code == status.HTTP_401_UNAUTHORIZED:
         return RedirectResponse(
@@ -766,14 +797,19 @@ async def handle_create_organizer(
             status_code=status.HTTP_303_SEE_OTHER
         )
 
-    if response.status_code != status.HTTP_201_CREATED:
+    if response.status_code not in [status.HTTP_201_CREATED, status.HTTP_200_OK]:
+        try:
+            error_detail = response.json().get("detail", response.text)
+        except Exception:
+            error_detail = response.text
+        
         raise HTTPException(
             status_code=response.status_code,
-            detail=response.text
+            detail=f"Error al crear organizador: {error_detail}"
         )
 
     return RedirectResponse(
-        url="/home",
+        url="/organizer",
         status_code=status.HTTP_303_SEE_OTHER
     )
 

@@ -1,7 +1,7 @@
-// // static/js/organizer_operations.js
+// static/js/organizer_operations.js
 
-// // Base URL de tu API (mismo host y puerto que en eventos)
-// const API_URL = "http://127.0.0.1:8000/organizer";
+// Base URL de tu API (mismo host y puerto que en eventos)
+const API_URL = "http://127.0.0.1:8000";
 
 /**
  * Elimina un organizador por su ID.
@@ -33,30 +33,3 @@ function deleteOrganizer(organizerId) {
     });
 }
 
-
-document.getElementById("login-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const form = e.target;
-    const formData = new FormData(form);
-
-    // Elimina el campo confirm_password antes de enviar
-    formData.delete("confirm_password");
-
-    fetch("/create-organizer", {
-        method: "POST",
-        body: formData,
-    })
-        .then((response) => {
-            if (response.redirected) {
-                window.location.href = response.url;
-            } else if (!response.ok) {
-                return response.text().then((errorText) => {
-                    alert("Error en el registro: " + errorText);
-                });
-            }
-        })
-        .catch((err) => {
-            alert("Error de red: " + err.message);
-        });
-});

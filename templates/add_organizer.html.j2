@@ -40,7 +40,7 @@
             <h1>Registro</h1>
         </div>
 
-        <form method="post" action="/create-organizer" id="login-form" enctype="multipart/form-data">
+        <form method="post" action="/create-organizer" id="login-form">
             <div class="input-group">
                 <div>
                     <label for="first_name">Nombre:</label>
@@ -66,3 +66,7 @@
     </div>
 </div>
 {% endblock main %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/add_organizer.js') }}"></script>
+{% endblock scripts %}
