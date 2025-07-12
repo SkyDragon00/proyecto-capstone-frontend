@@ -29,7 +29,11 @@ templates.env.filters["strftime"] = lambda date_str: (  # type: ignore
     response_class=HTMLResponse,
     summary="Endpoint to retrieve the home page"
 )
-async def home(request: Request, settings: SettingsDependency):
+async def home(
+    request: Request,
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None
+):
     """Endpoint to retrieve the home page with upcoming events.
 
     \f
@@ -53,7 +57,8 @@ async def home(request: Request, settings: SettingsDependency):
         name="index.html.j2",
         context={
             "request": request,
-            "events": events
+            "events": events,
+            "role": role
         }
     )
 
@@ -590,6 +595,11 @@ async def profile(
             headers={"Authorization": f"Bearer {access_token}"}
         )
 
+        events_to_react = await client.get(
+            f"{settings.API_URL}/events/events-to-react",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
     if response.status_code == status.HTTP_401_UNAUTHORIZED:
         return RedirectResponse(
             url="/login",
@@ -601,6 +611,17 @@ async def profile(
             status_code=response.status_code,
             detail=response.text
         )
+
+    if events_to_react.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=events_to_react.status_code,
+            detail=events_to_react.text
+        )
+
+    events_to_react = events_to_react.json()
+
+    if not events_to_react:
+        events_to_react = []
 
     user = response.json()
 
@@ -619,7 +640,8 @@ async def profile(
         context={
             "request": request,
             "user": user,
-            "api_url": settings.API_URL
+            "api_url": settings.API_URL,
+            "events_to_react": events_to_react
         }
     )
 

@@ -43,8 +43,11 @@
 </a>
 
 {% if not event.id in registered_events_ids %}
-<a href="/register-to/{{ event.id }}" class="a-button-outline-red">
+<a href="/register-to/{{ event.id }}" class="a-button-outline-red" id="register-button">
     Registrarse
+</a>
+<a href="/add-companion/{{ event.id }}" class="a-button-outline-red" id="add-companion-button">
+    Añadir Acompañante
 </a>
 {% else %}
 <a href="/unregister-to/{{ event.id }}" class="a-button-outline-red">
@@ -52,3 +55,7 @@
 </a>
 {% endif %}
 {% endblock main %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/register_companions.js') }}"></script>
+{% endblock scripts %}
