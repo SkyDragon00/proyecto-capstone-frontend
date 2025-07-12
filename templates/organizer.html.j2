@@ -28,7 +28,7 @@
     </thead>
     <tbody>
         {% for org in organizers %}
-        <tr>
+        <tr id="organizer-row-{{ org.id }}">
             <td>{{ org.id }}</td>
             <td>{{ org.first_name }}</td>
             <td>{{ org.last_name }}</td>
@@ -48,5 +48,9 @@
 {% endblock main %}
 
 {% block scripts %}
-<script src="{{ url_for('static', path='js/organizer_operations.js') }}"></script>
+<script>
+    // Debug: verificar cookies disponibles
+    console.log("Cookies disponibles en el template:", document.cookie);
+</script>
+<script src="{{ url_for('static', path='js/organizer_operations.js') }}?v=2"></script>
 {% endblock scripts %}

@@ -159,5 +159,29 @@
             color: var(--tertiary-color);
             font-size: 0.875rem;
         }
+
+        /* Estilos para grupos de botones */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-group .a-button-outlined {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-medium);
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .button-group .a-button-outlined:hover {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+        }
     }
 }

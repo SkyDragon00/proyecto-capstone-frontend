@@ -1,0 +1,74 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Editar Organizador{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
+{% endblock head %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="/organizer">Organizadores</a>
+</li>
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<video autoplay loop muted playsinline id="bg-video">
+    <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+</video>
+
+<div class="login-container">
+    <div class="login-form">
+        <div class="login-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 26 26" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-user-edit">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                <path d="M6 21v-2a4 4 0 0 1 4 -4h4.5" />
+                <path d="M18.42 15.61a2.1 2.1 0 1 1 2.97 2.97L18 22h-3v-3l3.39-3.39z" />
+            </svg>
+
+            <h1>Editar Organizador</h1>
+        </div>
+
+        <form method="post" action="/edit-organizer/{{ organizer.id }}" id="edit-form">
+            <div class="input-group">
+                <div>
+                    <label for="first_name">Nombre:</label>
+                    <input type="text" id="first_name" name="first_name" value="{{ organizer.first_name }}" placeholder="Nombre">
+                </div>
+                <div>
+                    <label for="last_name">Apellido:</label>
+                    <input type="text" id="last_name" name="last_name" value="{{ organizer.last_name }}" placeholder="Apellido">
+                </div>
+            </div>
+
+            <label for="email">Correo:</label>
+            <input type="email" id="email" name="email" value="{{ organizer.email }}" placeholder="ejemplo@gmail.com">
+
+            <label for="password">Nueva Contraseña (opcional):</label>
+            <input type="password" id="password" name="password" placeholder="••••••••">
+
+            <div class="button-group" style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="a-button-filled-red">Actualizar</button>
+                <a href="/organizer" class="a-button-outlined">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock main %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/edit_organizer.js') }}"></script>
+{% endblock scripts %}
