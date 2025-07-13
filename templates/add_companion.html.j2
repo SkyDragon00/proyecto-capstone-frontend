@@ -1,0 +1,17 @@
+{% extends "base.html.j2" %}
+
+{% block title %}{{ event.name }}{% endblock title %}
+
+{% block header_nav %}
+{% endblock header_nav %}
+
+{% block main %}
+<h1>Añade un Acompañante para {{ event.name }}</h1>
+<p>Por favor, ingresa la identificación (cédula o pasaporte) del acompañante:</p>
+<input type="text" id="companion_identification" name="companion_identification" required>
+<button onclick="addCompanion({{ event.id }})">Añadir Acompañante</button>
+{% endblock main %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/add_companion.js') }}"></script>
+{% endblock scripts %}
