@@ -1,0 +1,127 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Editar Staff{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
+<script src="{{ url_for('static', path='js/staff_operations.js') }}"></script>
+{% endblock head %}
+
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="/staff">Staff</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
+
+{% block main %}
+<video autoplay loop muted playsinline id="bg-video">
+    <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+</video>
+
+<div class="login-container">
+    <div class="login-form">
+        <div class="login-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-user-edit">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                <path d="M6 21v-2a4 4 0 0 1 4 -4h4" />
+                <path d="M18.42 15.61a2.1 2.1 0 1 1 2.97 2.97L18 22h-3v-3l3.42-3.39z" />
+            </svg>
+
+            <h1>Editar Staff</h1>
+            <p>Modifica la información del miembro del staff.</p>
+        </div>
+
+        <form method="post" action="/staff/update/{{ staff_member.id }}" id="edit-staff-form" enctype="multipart/form-data">
+            <div class="input-group">
+                <div>
+                    <label for="first_name">Nombre:</label>
+                    <input type="text" id="first_name" name="first_name" value="{{ staff_member.first_name }}" placeholder="Nombre">
+                </div>
+                <div>
+                    <label for="last_name">Apellido:</label>
+                    <input type="text" id="last_name" name="last_name" value="{{ staff_member.last_name }}" placeholder="Apellido">
+                </div>
+            </div>
+
+            <label for="email">Correo:</label>
+            <input type="email" id="email" name="email" value="{{ staff_member.email }}" placeholder="ejemplo@gmail.com">
+
+            <label for="password">Nueva Contraseña (opcional):</label>
+            <input type="password" id="password" name="password" placeholder="••••••••">
+            <small style="color: #666; font-size: 0.85rem;">Deja en blanco si no quieres cambiar la contraseña</small>
+
+            <div class="button-group">
+                <button type="submit" class="a-button-filled-red">Actualizar</button>
+                <a href="/staff" class="a-button-outline">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.a-button-outline {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #dc2626;
+    color: #dc2626;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
+    transition: all 0.2s;
+    background: transparent;
+    font-weight: 500;
+}
+
+.a-button-outline:hover {
+    background: #dc2626;
+    color: white;
+}
+
+small {
+    display: block;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+}
+</style>
+
+<script>
+document.getElementById('edit-staff-form').addEventListener('submit', function(e) {
+    const firstName = document.getElementById('first_name').value.trim();
+    const lastName = document.getElementById('last_name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    
+    if (!firstName && !lastName && !email && !document.getElementById('password').value) {
+        e.preventDefault();
+        alert('Debes modificar al menos un campo para actualizar.');
+        return;
+    }
+    
+    if (email && !isValidEmail(email)) {
+        e.preventDefault();
+        alert('Por favor, introduce un email válido.');
+        return;
+    }
+});
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+</script>
+{% endblock main %}
