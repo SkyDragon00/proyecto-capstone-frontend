@@ -505,7 +505,7 @@ async def event_detail(
         )
 
         user_response = await client.get(
-            f"{settings.API_URL}/info",
+            f"{settings.API_URL}/assistant/info",
             headers={"Authorization": f"Bearer {access_token}"}
         )
 
@@ -520,6 +520,7 @@ async def event_detail(
     if user_response.status_code == status.HTTP_200_OK:
         role = user_response.json().get("role")
 
+    user_info = user_response.json()
     return templates.TemplateResponse(
         request=request,
         name="event_detail.html.j2",
@@ -528,6 +529,7 @@ async def event_detail(
             "event": event,
             "registered_events_ids": registered_events_ids,
             "role": role,
+            "user_info": user_info
         }
     )
 
