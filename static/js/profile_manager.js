@@ -109,6 +109,7 @@ class ProfileManager {
 
         return isValid;
     }
+    
 
     clearFieldError(event) {
         const field = event.target;
