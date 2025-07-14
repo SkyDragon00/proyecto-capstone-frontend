@@ -43,15 +43,22 @@
 </a>
 
 {% if not event.id in registered_events_ids %}
+<form method="get" action="" id="pardot-form">
+    <input type="hidden" value="{{ user_info.first_name }} {{ user_info.last_name }}" name="name">
+    <input type="hidden" value="{{ user_info.email }}" name="email">
+    <input type="hidden" value="{{ user_info.assistant.phone }}" name="phone">
+    <input type="hidden" value="{{ user_info.assistant.id_number }}" name="id_number">
+</form>
+
 <a href="/register-to/{{ event.id }}" class="a-button-outline-red" id="register-button">
     Registrarse
-</a>
-<a href="/add-companion/{{ event.id }}" class="a-button-outline-red" id="add-companion-button">
-    Añadir Acompañante
 </a>
 {% else %}
 <a href="/unregister-to/{{ event.id }}" class="a-button-outline-red">
     Cancelar Inscripción
+</a>
+<a href="/add-companion/{{ event.id }}" class="a-button-outline-red" id="add-companion-button">
+    Añadir Acompañante
 </a>
 {% endif %}
 {% endblock main %}
@@ -61,4 +68,5 @@
 Es posible que este archivo js se tenga que eliminar
 <script src="{{ url_for('static', path='js/register_companions.js') }}"></script>
 #}
+<script src="{{ url_for('static', path='js/register_companions.js') }}"></script>
 {% endblock scripts %}
