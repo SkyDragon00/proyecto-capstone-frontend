@@ -31,7 +31,11 @@ templates.env.filters["strftime"] = lambda date_str: (  # type: ignore
     response_class=HTMLResponse,
     summary="Endpoint to retrieve the home page"
 )
-async def home(request: Request, settings: SettingsDependency):
+async def home(
+    request: Request,
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None
+):
     """Endpoint to retrieve the home page with upcoming events.
 
     \f
@@ -55,8 +59,33 @@ async def home(request: Request, settings: SettingsDependency):
         name="index.html.j2",
         context={
             "request": request,
-            "events": events
+            "events": events,
+            "role": role
         }
+    )
+
+
+@app.get(
+    "/terms",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the terms and conditions page"
+)
+async def terms(
+    request: Request,
+):
+    """Endpoint to retrieve the terms and conditions page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="terms.html.j2",
     )
 
 
@@ -192,25 +221,8 @@ def handle_login(
 
     response = RedirectResponse(
         url="/home", status_code=status.HTTP_303_SEE_OTHER)
-    
-    # Configuración de cookies más explícita
-    response.set_cookie(
-        key="access_token", 
-        value=token,
-        httponly=False,  # Temporalmente para debug
-        secure=False,    # Para desarrollo HTTP
-        samesite="lax",  # Permitir envío en requests de mismo sitio
-        path="/"         # Disponible en toda la aplicación
-    )
-    response.set_cookie(
-        key="role", 
-        value=role, 
-        httponly=False,  # Temporalmente para debug
-        secure=False,    # Para desarrollo HTTP
-        samesite="lax",  # Permitir envío en requests de mismo sitio
-        path="/"         # Disponible en toda la aplicación
-    )
-    
+    response.set_cookie(key="access_token", value=token, secure=True)
+    response.set_cookie(key="role", value=role)
     return response
 
 
@@ -268,6 +280,45 @@ async def record_assistant(
             "request": request,
             "event_id": event_id,
             "event_date_id": event_date_id,
+        }
+    )
+
+
+@app.get(
+    "/settings",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the settings page"
+)
+async def settings(
+    request: Request,
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the settings page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    app_settings = requests.get(f"{settings.API_URL}/organizer/get-settings")
+
+    if app_settings.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=app_settings.status_code,
+            detail="Error al obtener la configuración de la aplicación"
+        )
+
+    app_settings = app_settings.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="settings.html.j2",
+        context={
+            "request": request,
+            "api_url": settings.API_URL,
+            "app_settings": app_settings
         }
     )
 
@@ -482,6 +533,70 @@ async def event_detail(
 
 
 @app.get(
+    "/edit-event/{event_id}",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the edit event page"
+)
+async def edit_event(
+    request: Request,
+    event_id: Annotated[
+        int,
+        Path(
+            title="Event ID",
+            description="The ID of the event to edit",
+        )
+    ],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the edit event page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to edit.
+    :type event_id: int
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/{event_id}",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    event = response.json()
+    if not event:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Event not found"
+        )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="edit_event.html.j2",
+        context={
+            "request": request,
+            "event": event
+        }
+    )
+
+
+@app.get(
     "/register-to/{event_id}",
     response_class=RedirectResponse,
     summary="Endpoint to register to an event",
@@ -582,6 +697,56 @@ async def unregister_from_event(
 
 
 @app.get(
+    "/add-companion/{event_id}",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the add companion page"
+)
+async def add_companion(
+    request: Request,
+    event_id: Annotated[int, Path()],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the add companion page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    response = requests.get(
+        f"{settings.API_URL}/events/{event_id}",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    event = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_companion.html.j2",
+        context={
+            "request": request,
+            "event_id": event_id,
+            "event": event
+        }
+    )
+
+
+@app.get(
     "/profile",
     response_class=HTMLResponse,
     summary="Endpoint to retrieve the profile page"
@@ -607,6 +772,11 @@ async def profile(
             headers={"Authorization": f"Bearer {access_token}"}
         )
 
+        events_to_react = await client.get(
+            f"{settings.API_URL}/events/events-to-react",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
     if response.status_code == status.HTTP_401_UNAUTHORIZED:
         return RedirectResponse(
             url="/login",
@@ -618,6 +788,17 @@ async def profile(
             status_code=response.status_code,
             detail=response.text
         )
+
+    if events_to_react.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=events_to_react.status_code,
+            detail=events_to_react.text
+        )
+
+    events_to_react = events_to_react.json()
+
+    if not events_to_react:
+        events_to_react = []
 
     user = response.json()
 
@@ -636,7 +817,8 @@ async def profile(
         context={
             "request": request,
             "user": user,
-            "api_url": settings.API_URL
+            "api_url": settings.API_URL,
+            "events_to_react": events_to_react
         }
     )
 
@@ -671,17 +853,17 @@ async def update_profile(
     :return: Redirect response to the profile page.
     :rtype: RedirectResponse
     """
-    
+
     print(f"=== DEBUG UPDATE PROFILE START ===")
     print(f"Request method: {request.method}")
     print(f"Request URL: {request.url}")
     print(f"Request headers: {dict(request.headers)}")
-    
+
     # Obtener los datos del formulario manualmente
     form_data = await request.form()
-    
+
     print(f"Form data received: {dict(form_data)}")
-    
+
     # Extraer datos del usuario
     user_data = {}
     if form_data.get("first_name"):
@@ -692,7 +874,7 @@ async def update_profile(
         user_data["email"] = form_data.get("email")
     if form_data.get("password"):
         user_data["password"] = form_data.get("password")
-    
+
     # Extraer datos específicos del assistant
     assistant_data = {}
     if form_data.get("phone"):
@@ -703,10 +885,10 @@ async def update_profile(
         assistant_data["gender"] = form_data.get("gender")
     if form_data.get("date_of_birth"):
         assistant_data["date_of_birth"] = form_data.get("date_of_birth")
-    
+
     print(f"Extracted user_data: {user_data}")
     print(f"Extracted assistant_data: {assistant_data}")
-    
+
     if not user_data and not assistant_data:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -717,13 +899,13 @@ async def update_profile(
     user_info = await get_user_info(access_token, settings)
     if isinstance(user_info, RedirectResponse):
         return user_info
-    
+
     user_id = user_info.get("id")
     user_role = user_info.get("role")
-    
+
     print(f"User info: {user_info}")
     print(f"User ID: {user_id}, User Role: {user_role}")
-    
+
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -734,10 +916,10 @@ async def update_profile(
     response = await perform_profile_update(
         user_role, user_id, user_data, assistant_data, access_token, settings
     )
-    
+
     print(f"Response status: {response.status_code}")
     print(f"Response text: {response.text}")
-    
+
     if response.status_code == status.HTTP_401_UNAUTHORIZED:
         return RedirectResponse(
             url="/login",
@@ -749,9 +931,9 @@ async def update_profile(
             error_detail = response.json().get("detail", response.text)
         except Exception:
             error_detail = response.text
-        
+
         print(f"Error detail: {error_detail}")
-        
+
         raise HTTPException(
             status_code=response.status_code,
             detail=f"Error al actualizar perfil: {error_detail}"
@@ -788,11 +970,11 @@ async def get_user_info(access_token: str, settings):
 
 
 async def perform_profile_update(
-    user_role: str, 
-    user_id: int, 
-    user_data: dict, 
-    assistant_data: dict, 
-    access_token: str, 
+    user_role: str,
+    user_id: int,
+    user_data: dict,
+    assistant_data: dict,
+    access_token: str,
     settings
 ):
     """Helper function to perform the profile update based on user role."""
@@ -801,7 +983,7 @@ async def perform_profile_update(
     print(f"User ID: {user_id}")
     print(f"User Data Raw: {user_data}")
     print(f"Assistant Data Raw: {assistant_data}")
-    
+
     async with httpx.AsyncClient() as client:
         if user_role == "staff":
             update_url = f"{settings.API_URL}/staff/{user_id}"
@@ -824,47 +1006,55 @@ async def perform_profile_update(
         elif user_role == "assistant":
             update_url = f"{settings.API_URL}/assistant/{user_id}"
             print(f"Assistant Update URL: {update_url}")
-            
+
             # Validar los datos usando los modelos Pydantic antes de enviar
             try:
                 from models.models import UserUpdate, AssistantUpdate
                 import json
                 from datetime import date
-                
+
                 print(f"Creating UserUpdate with data: {user_data}")
                 print(f"Creating AssistantUpdate with data: {assistant_data}")
-                
+
                 # Crear instancias de los modelos para validación
-                user_update_obj = UserUpdate(**user_data) if user_data else UserUpdate()
-                assistant_update_obj = AssistantUpdate(**assistant_data) if assistant_data else AssistantUpdate()
-                
+                user_update_obj = UserUpdate(
+                    **user_data) if user_data else UserUpdate()
+                assistant_update_obj = AssistantUpdate(
+                    **assistant_data) if assistant_data else AssistantUpdate()
+
                 print(f"UserUpdate object created: {user_update_obj}")
-                print(f"AssistantUpdate object created: {assistant_update_obj}")
-                
+                print(
+                    f"AssistantUpdate object created: {assistant_update_obj}")
+
                 # Convertir a diccionarios excluyendo valores no configurados
-                user_update_dict = user_update_obj.model_dump(exclude_unset=True)
-                assistant_update_dict = assistant_update_obj.model_dump(exclude_unset=True)
-                
+                user_update_dict = user_update_obj.model_dump(
+                    exclude_unset=True)
+                assistant_update_dict = assistant_update_obj.model_dump(
+                    exclude_unset=True)
+
                 print(f"UserUpdate dict: {user_update_dict}")
                 print(f"AssistantUpdate dict: {assistant_update_dict}")
-                
+
                 # Convertir fechas a string ISO format si existen
                 if 'date_of_birth' in assistant_update_dict and assistant_update_dict['date_of_birth']:
-                    print(f"Processing date_of_birth: {assistant_update_dict['date_of_birth']} (type: {type(assistant_update_dict['date_of_birth'])})")
+                    print(
+                        f"Processing date_of_birth: {assistant_update_dict['date_of_birth']} (type: {type(assistant_update_dict['date_of_birth'])})")
                     if isinstance(assistant_update_dict['date_of_birth'], date):
-                        assistant_update_dict['date_of_birth'] = assistant_update_dict['date_of_birth'].isoformat()
-                        print(f"Converted date_of_birth to: {assistant_update_dict['date_of_birth']}")
-                
+                        assistant_update_dict['date_of_birth'] = assistant_update_dict['date_of_birth'].isoformat(
+                        )
+                        print(
+                            f"Converted date_of_birth to: {assistant_update_dict['date_of_birth']}")
+
                 # Crear el payload
                 payload = {}
                 if user_update_dict:
                     payload["user_update"] = user_update_dict
                 if assistant_update_dict:
                     payload["assistant_update"] = assistant_update_dict
-                
+
                 print(f"Final payload: {payload}")
                 print(f"Payload JSON: {json.dumps(payload, default=str)}")
-                
+
                 return await client.patch(
                     update_url,
                     headers={
@@ -873,7 +1063,7 @@ async def perform_profile_update(
                     },
                     json=payload
                 )
-                
+
             except Exception as validation_error:
                 print(f"Validation error: {str(validation_error)}")
                 print(f"Error type: {type(validation_error)}")
@@ -943,7 +1133,7 @@ async def delete_profile(
     user_info = response.json()
     user_id = user_info.get("id")
     user_role = user_info.get("role")
-    
+
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -988,7 +1178,7 @@ async def delete_profile(
             error_detail = response.json().get("detail", response.text)
         except Exception:
             error_detail = response.text
-        
+
         raise HTTPException(
             status_code=response.status_code,
             detail=f"Error al eliminar perfil: {error_detail}"
@@ -999,7 +1189,7 @@ async def delete_profile(
         # También limpiar las cookies al eliminar el perfil
         response = {"message": "Perfil eliminado con éxito"}
         return response
-    
+
     # Si es una request normal, redireccionar al logout para limpiar cookies
     return RedirectResponse(
         url="/logout",
@@ -1186,8 +1376,9 @@ async def edit_staff_form(
         )
 
     all_staff = response.json()
-    staff_member = next((staff for staff in all_staff if staff["id"] == staff_id), None)
-    
+    staff_member = next(
+        (staff for staff in all_staff if staff["id"] == staff_id), None)
+
     if not staff_member:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -1231,10 +1422,10 @@ async def update_staff(
     :return: Redirect response to the staff page.
     :rtype: RedirectResponse
     """
-    
+
     # Obtener los datos del formulario
     form_data = await request.form()
-    
+
     # Extraer datos para actualización
     user_data = {}
     if form_data.get("first_name"):
@@ -1245,7 +1436,7 @@ async def update_staff(
         user_data["email"] = form_data.get("email")
     if form_data.get("password") and form_data.get("password").strip():
         user_data["password"] = form_data.get("password")
-    
+
     if not user_data:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -1280,7 +1471,7 @@ async def update_staff(
             error_detail = response.json().get("detail", response.text)
         except Exception:
             error_detail = response.text
-        
+
         raise HTTPException(
             status_code=response.status_code,
             detail=f"Error al actualizar staff: {error_detail}"
@@ -1339,10 +1530,10 @@ async def delete_staff(
             error_detail = response.json().get("detail", response.text)
         except Exception:
             error_detail = response.text
-        
+
         if request.headers.get("accept") == "application/json":
             return {"error": f"Error al eliminar staff: {error_detail}"}
-        
+
         raise HTTPException(
             status_code=response.status_code,
             detail=f"Error al eliminar staff: {error_detail}"
@@ -1351,7 +1542,7 @@ async def delete_staff(
     # Si es una request AJAX/JavaScript, devolver JSON de éxito
     if request.headers.get("accept") == "application/json":
         return {"message": "Staff eliminado con éxito"}
-    
+
     # Si es una request normal, redireccionar
     return RedirectResponse(
         url="/staff",
@@ -1443,6 +1634,54 @@ async def create_organizer(
     )
 
 
+# @app.post(
+#     "/create-organizer",
+#     response_class=RedirectResponse,
+#     summary="Endpoint to handle create organizer form submission",
+#     status_code=status.HTTP_303_SEE_OTHER
+# )
+# async def handle_create_organizer(
+#     form: Annotated[
+#         Staff,
+#         Form()
+#     ],
+#     access_token: Annotated[str, Cookie()],
+#     settings: SettingsDependency
+# ):
+#     """Endpoint to handle create organizer form submission.
+
+#     \f
+
+#     :param form: Staff object containing the form data.
+#     :type form: Staff
+#     :return: Redirect response to the home page.
+#     :rtype: RedirectResponse
+#     """
+
+#     response = requests.post(
+#         f"{settings.API_URL}/organizer/add",
+#         headers={"Authorization": f"Bearer {access_token}"},
+#         data=form.model_dump()
+#     )
+
+#     if response.status_code == status.HTTP_401_UNAUTHORIZED:
+#         return RedirectResponse(
+#             url="/login",
+#             status_code=status.HTTP_303_SEE_OTHER
+#         )
+
+#     if response.status_code != status.HTTP_201_CREATED:
+#         raise HTTPException(
+#             status_code=response.status_code,
+#             detail=response.text
+#         )
+
+#     return RedirectResponse(
+#         url="/home",
+#         status_code=status.HTTP_303_SEE_OTHER
+#     )
+
+
 @app.post(
     "/create-organizer",
     response_class=RedirectResponse,
@@ -1506,6 +1745,56 @@ async def handle_create_organizer(
         url="/organizer",
         status_code=status.HTTP_303_SEE_OTHER
     )
+
+
+@app.get(
+    "/logout",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle logout",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def logout():
+    """Endpoint to handle logout.
+
+    \f
+
+    :return: Redirect response to the home page.
+    :rtype: RedirectResponse
+    """
+
+    response = RedirectResponse(
+        url="/home", status_code=status.HTTP_303_SEE_OTHER)
+    response.delete_cookie(key="access_token")
+    response.delete_cookie(key="role")
+    return response
+
+
+# @app.get(
+#     "/organizer",
+#     response_class=HTMLResponse,
+#     summary="Página del organizador con sus eventos"
+# )
+# async def organizer(
+#     request: Request,
+#     access_token: Annotated[str, Cookie()] = None,
+#     settings: SettingsDependency = None
+# ):
+#     """Página que muestra todos los usuarios organizadores."""
+#     async with httpx.AsyncClient() as client:
+#         response = await client.get(
+#             f"{settings.API_URL}/organizer/all",
+#             headers={
+#                 "Authorization": f"Bearer {access_token}"} if access_token else None
+#         )
+
+#     organizers = response.json() or []
+#     return templates.TemplateResponse(
+#         "organizer.html.j2",
+#         {
+#             "request": request,
+#             "organizers": organizers
+#         }
+#     )
 
 
 @app.get(
@@ -1692,10 +1981,10 @@ async def delete_organizer(
             error_detail = response.json().get("detail", response.text)
         except Exception:
             error_detail = response.text
-        
+
         if request.headers.get("accept") == "application/json":
             return {"error": f"Error al eliminar organizador: {error_detail}"}
-        
+
         raise HTTPException(
             status_code=response.status_code,
             detail=f"Error al eliminar organizador: {error_detail}"
@@ -1704,7 +1993,7 @@ async def delete_organizer(
     # Si es una request AJAX/JavaScript, devolver JSON de éxito
     if request.headers.get("accept") == "application/json":
         return {"message": "Organizador eliminado con éxito"}
-    
+
     # Si es una request normal, redireccionar
     return RedirectResponse(
         url="/organizer",
@@ -1712,16 +2001,387 @@ async def delete_organizer(
     )
 
 
-@app.get("/debug-cookies")
-async def debug_cookies(
+@app.get(
+    "/create-event",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the create event page"
+)
+async def create_event_page(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the create event page.
+
+    \\f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    # Check if the user is an organizer
+    # This is a placeholder, replace with actual logic to check user role
+    # For example, decode the access_token or call an API endpoint
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_event.html.j2",
+        context={
+            "request": request,
+        }
+    )
+
+
+@app.post(
+    "/create-event",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle create event form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_create_event(
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency,
+    name: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    location: Annotated[str, Form()],
+    maps_link: Annotated[str, Form()],
+    capacity: Annotated[int, Form()],
+    capacity_type: Annotated[str, Form()],
+    image: Annotated[UploadFile, File()]
+):
+    """Endpoint to handle create event form submission.
+
+    \\f
+
+    :param name: Event name.
+    :type name: str
+    :param description: Event description.
+    :type description: str
+    :param location: Event location.
+    :type location: str
+    :param maps_link: Event maps link.
+    :type maps_link: str
+    :param capacity: Event maximum capacity.
+    :type capacity: int
+    :param capacity_type: Type of capacity for the event.
+    :type capacity_type: str
+    :param image: Path to event image.
+    :type image: UploadFile
+    :return: Redirect response to the events page.
+    :rtype: RedirectResponse
+    """
+    event_data = {
+        "name": name,
+        "description": description,
+        "location": location,
+        "maps_link": maps_link,
+        "capacity": capacity,
+        "capacity_type": capacity_type,
+    }
+    files = {"image": (image.filename, image.file, image.content_type)}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{settings.API_URL}/events/add",
+            headers={"Authorization": f"Bearer {access_token}"},
+            data=event_data,
+            files=files
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_201_CREATED:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return RedirectResponse(
+        url="/events",  # Or perhaps a detail page for the newly created event
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
+    "/all-events-view",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the all events view page"
+)
+async def all_events_view(
+    request: Request,
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the all events view page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{settings.API_URL}/events/all")
+
+    events = response.json()
+
+    if not events:
+        events = []
+
+    return templates.TemplateResponse(
+        request=request,
+        name="all_events_view.html.j2",
+        context={
+            "request": request,
+            "events": events
+        }
+    )
+
+
+@app.get(
+    "/staff",
+    response_class=HTMLResponse,
+    summary="Página de staff con todos los usuarios staff"
+)
+async def staff(
     request: Request,
     access_token: Annotated[str, Cookie()] = None,
-    role: Annotated[str, Cookie()] = None
+    settings: SettingsDependency = None
 ):
-    """Endpoint de debug para verificar cookies."""
-    return {
-        "access_token": access_token,
-        "role": role,
-        "all_cookies": dict(request.cookies),
-        "headers": dict(request.headers)
+    """Página de staff con todos los usuarios staff."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/users/staff",
+            headers={
+                "Authorization": f"Bearer {access_token}"} if access_token else None
+        )
+
+        response = await client.get(
+            f"{settings.API_URL}/staff/all",
+            headers={
+                "Authorization": f"Bearer {access_token}"} if access_token else None
+        )
+    organizers = response.json() if response.status_code == 200 else []
+    return templates.TemplateResponse(
+        request=request,
+        name="staff.html.j2",
+        context={
+            "request": request,
+            "organizers": organizers
+        }
+    )
+
+
+@app.get(
+    "/{event_id}/event-dates",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the event dates page"
+)
+async def event_dates_view(
+    request: Request,
+    event_id: int,
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the event dates page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to retrieve dates for.
+    :type event_id: int
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{settings.API_URL}/events/{event_id}/dates")
+
+    event_dates = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="event_dates_view.html.j2",
+        context={
+            "request": request,
+            "event_dates": event_dates,
+            "event_id": event_id,
+        }
+    )
+
+
+# /{{ event_id }}/create-date
+@app.get(
+    "/{event_id}/create-date",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the create event date page"
+)
+async def create_event_date_page(
+    request: Request,
+    event_id: int,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the create event date page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to create a date for.
+    :type event_id: int
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_event_date.html.j2",
+        context={
+            "request": request,
+            "event_id": event_id,
+        }
+    )
+
+
+@app.post(
+    "/{event_id}/create-date",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle create event date form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_create_event_date(
+    request: Request,
+    event_id: int,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency,
+    day_date: Annotated[str, Form()],
+    start_time: Annotated[str, Form()],
+    end_time: Annotated[str, Form()]
+):
+    """Endpoint to handle create event date form submission.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to create a date for.
+    :type event_id: int
+    :param day_date: Date of the event date.
+    :type day_date: str
+    :param start_time: Start time of the event date.
+    :type start_time: str
+    :param end_time: End time of the event date.
+    :type end_time: str
+    :return: Redirect response to the event dates page.
+    :rtype: RedirectResponse
+    """
+
+    data = {
+        "day_date": day_date,
+        "start_time": start_time,
+        "end_time": end_time,
     }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{settings.API_URL}/events/{event_id}/date/add",
+            headers={"Authorization": f"Bearer {access_token}"},
+            data=data
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_201_CREATED:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return RedirectResponse(
+        url=f"/{event_id}/event-dates",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
+    "/staff-to-event",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the add staff to event page"
+)
+async def add_staff_to_event_page(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the add staff to event page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    # Envía todos los staff al template y también todos los eventos
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/staff/all",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    staff = response.json()
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/upcoming",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    events = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_staff_to_event.html.j2",
+        context={
+            "request": request,
+            "staff_list": staff,
+            "events_list": events
+        }
+    )
