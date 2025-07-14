@@ -1359,6 +1359,359 @@ async def delete_staff(
     )
 
 
+@app.get(
+    "/organizer",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the organizers management page"
+)
+async def organizer_list(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the organizers management page with all organizers.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param access_token: Access token from cookie.
+    :type access_token: str
+    :param settings: Application settings.
+    :type settings: SettingsDependency
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/organizer/all",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail="Error al obtener la lista de organizadores"
+        )
+
+    organizers = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="organizer.html.j2",
+        context={
+            "request": request,
+            "organizers": organizers,
+            "api_url": settings.API_URL
+        }
+    )
+
+
+@app.get(
+    "/create-organizer",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the create organizer page"
+)
+async def create_organizer(
+    request: Request,
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the create organizer page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_organizer.html.j2",
+        context={
+            "request": request,
+        }
+    )
+
+
+@app.post(
+    "/create-organizer",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle create organizer form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_create_organizer(
+    first_name: Annotated[str, Form()],
+    last_name: Annotated[str, Form()],
+    email: Annotated[str, Form()],
+    password: Annotated[str, Form()],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to handle create organizer form submission.
+
+    \f
+
+    :param first_name: First name of the organizer.
+    :type first_name: str
+    :param last_name: Last name of the organizer.
+    :type last_name: str
+    :param email: Email of the organizer.
+    :type email: str
+    :param password: Password of the organizer.
+    :type password: str
+    :param access_token: Access token from cookie.
+    :type access_token: str
+    :param settings: Application settings.
+    :type settings: SettingsDependency
+    :return: Redirect response to the organizer page.
+    :rtype: RedirectResponse
+    """
+
+    organizer_data = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "email": email,
+        "password": password
+    }
+
+    response = requests.post(
+        f"{settings.API_URL}/organizer/add",
+        headers={"Authorization": f"Bearer {access_token}"},
+        data=organizer_data
+    )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_201_CREATED:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return RedirectResponse(
+        url="/organizer",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
+    "/edit-organizer/{organizer_id}",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the edit organizer page"
+)
+async def edit_organizer_form(
+    request: Request,
+    organizer_id: Annotated[int, Path()],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the edit organizer page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param organizer_id: ID of the organizer to edit.
+    :type organizer_id: int
+    :param access_token: Access token from cookie.
+    :type access_token: str
+    :param settings: Application settings.
+    :type settings: SettingsDependency
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/organizer/{organizer_id}",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail="Error al obtener los datos del organizador"
+        )
+
+    organizer = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="edit_organizer.html.j2",
+        context={
+            "request": request,
+            "organizer": organizer,
+            "organizer_id": organizer_id
+        }
+    )
+
+
+@app.post(
+    "/edit-organizer/{organizer_id}",
+    response_class=RedirectResponse,
+    summary="Endpoint to handle edit organizer form submission",
+    status_code=status.HTTP_303_SEE_OTHER
+)
+async def handle_edit_organizer(
+    organizer_id: Annotated[int, Path()],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency,
+    first_name: Annotated[str, Form()] = "",
+    last_name: Annotated[str, Form()] = "",
+    email: Annotated[str, Form()] = "",
+    password: Annotated[str, Form()] = ""
+):
+    """Endpoint to handle edit organizer form submission.
+
+    \f
+
+    :param organizer_id: ID of the organizer to edit.
+    :type organizer_id: int
+    :param first_name: First name of the organizer.
+    :type first_name: str
+    :param last_name: Last name of the organizer.
+    :type last_name: str
+    :param email: Email of the organizer.
+    :type email: str
+    :param password: Password of the organizer.
+    :type password: str
+    :param access_token: Access token from cookie.
+    :type access_token: str
+    :param settings: Application settings.
+    :type settings: SettingsDependency
+    :return: Redirect response to the organizer page.
+    :rtype: RedirectResponse
+    """
+
+    # Crear datos solo con campos no vacíos
+    organizer_data = {}
+    if first_name:
+        organizer_data["first_name"] = first_name
+    if last_name:
+        organizer_data["last_name"] = last_name
+    if email:
+        organizer_data["email"] = email
+    if password:
+        organizer_data["password"] = password
+
+    if not organizer_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Debe proporcionar al menos un campo para actualizar"
+        )
+
+    async with httpx.AsyncClient() as client:
+        response = await client.patch(
+            f"{settings.API_URL}/organizer/{organizer_id}",
+            headers={"Authorization": f"Bearer {access_token}"},
+            json=organizer_data
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail="Error al actualizar el organizador"
+        )
+
+    return RedirectResponse(
+        url="/organizer",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.delete(
+    "/delete-organizer/{organizer_id}",
+    summary="Endpoint to delete an organizer"
+)
+async def delete_organizer(
+    request: Request,
+    organizer_id: Annotated[int, Path()],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to delete an organizer.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param organizer_id: ID of the organizer to delete.
+    :type organizer_id: int
+    :param access_token: Access token from cookie.
+    :type access_token: str
+    :param settings: Application settings.
+    :type settings: SettingsDependency
+    :return: JSON response or redirect response depending on request type.
+    :rtype: dict | RedirectResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.delete(
+            f"{settings.API_URL}/organizer/{organizer_id}",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        # Si es una request AJAX/JavaScript, devolver JSON
+        if request.headers.get("accept") == "application/json":
+            return {"error": "Unauthorized", "redirect": "/login"}
+        # Si es una request normal, redireccionar
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code not in [status.HTTP_204_NO_CONTENT, status.HTTP_200_OK]:
+        try:
+            error_detail = response.json().get("detail", response.text)
+        except Exception:
+            error_detail = response.text
+        
+        if request.headers.get("accept") == "application/json":
+            return {"error": f"Error al eliminar organizador: {error_detail}"}
+        
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=f"Error al eliminar organizador: {error_detail}"
+        )
+
+    # Si es una request AJAX/JavaScript, devolver JSON de éxito
+    if request.headers.get("accept") == "application/json":
+        return {"message": "Organizador eliminado con éxito"}
+    
+    # Si es una request normal, redireccionar
+    return RedirectResponse(
+        url="/organizer",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
 @app.get("/debug-cookies")
 async def debug_cookies(
     request: Request,
