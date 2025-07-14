@@ -31,7 +31,11 @@ templates.env.filters["strftime"] = lambda date_str: (  # type: ignore
     response_class=HTMLResponse,
     summary="Endpoint to retrieve the home page"
 )
-async def home(request: Request, settings: SettingsDependency):
+async def home(
+    request: Request,
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None
+):
     """Endpoint to retrieve the home page with upcoming events.
 
     \f
@@ -55,8 +59,33 @@ async def home(request: Request, settings: SettingsDependency):
         name="index.html.j2",
         context={
             "request": request,
-            "events": events
+            "events": events,
+            "role": role
         }
+    )
+
+
+@app.get(
+    "/terms",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the terms and conditions page"
+)
+async def terms(
+    request: Request,
+):
+    """Endpoint to retrieve the terms and conditions page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="terms.html.j2",
     )
 
 
@@ -192,25 +221,9 @@ def handle_login(
 
     response = RedirectResponse(
         url="/home", status_code=status.HTTP_303_SEE_OTHER)
-    
-    # Configuración de cookies más explícita
-    response.set_cookie(
-        key="access_token", 
-        value=token,
-        httponly=False,  # Temporalmente para debug
-        secure=False,    # Para desarrollo HTTP
-        samesite="lax",  # Permitir envío en requests de mismo sitio
-        path="/"         # Disponible en toda la aplicación
-    )
-    response.set_cookie(
-        key="role", 
-        value=role, 
-        httponly=False,  # Temporalmente para debug
-        secure=False,    # Para desarrollo HTTP
-        samesite="lax",  # Permitir envío en requests de mismo sitio
-        path="/"         # Disponible en toda la aplicación
-    )
-    
+   
+    response.set_cookie(key="access_token", value=token, secure=True)
+    response.set_cookie(key="role", value=role)
     return response
 
 
@@ -268,6 +281,45 @@ async def record_assistant(
             "request": request,
             "event_id": event_id,
             "event_date_id": event_date_id,
+        }
+    )
+
+
+@app.get(
+    "/settings",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the settings page"
+)
+async def settings(
+    request: Request,
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the settings page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    app_settings = requests.get(f"{settings.API_URL}/organizer/get-settings")
+
+    if app_settings.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=app_settings.status_code,
+            detail="Error al obtener la configuración de la aplicación"
+        )
+
+    app_settings = app_settings.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="settings.html.j2",
+        context={
+            "request": request,
+            "api_url": settings.API_URL,
+            "app_settings": app_settings
         }
     )
 
@@ -482,6 +534,70 @@ async def event_detail(
 
 
 @app.get(
+    "/edit-event/{event_id}",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the edit event page"
+)
+async def edit_event(
+    request: Request,
+    event_id: Annotated[
+        int,
+        Path(
+            title="Event ID",
+            description="The ID of the event to edit",
+        )
+    ],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the edit event page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_id: ID of the event to edit.
+    :type event_id: int
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/{event_id}",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    event = response.json()
+    if not event:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Event not found"
+        )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="edit_event.html.j2",
+        context={
+            "request": request,
+            "event": event
+        }
+    )
+
+
+@app.get(
     "/register-to/{event_id}",
     response_class=RedirectResponse,
     summary="Endpoint to register to an event",
@@ -582,6 +698,56 @@ async def unregister_from_event(
 
 
 @app.get(
+    "/add-companion/{event_id}",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the add companion page"
+)
+async def add_companion(
+    request: Request,
+    event_id: Annotated[int, Path()],
+    access_token: Annotated[str, Cookie()],
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the add companion page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    response = requests.get(
+        f"{settings.API_URL}/events/{event_id}",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    event = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_companion.html.j2",
+        context={
+            "request": request,
+            "event_id": event_id,
+            "event": event
+        }
+    )
+
+
+@app.get(
     "/profile",
     response_class=HTMLResponse,
     summary="Endpoint to retrieve the profile page"
@@ -607,6 +773,11 @@ async def profile(
             headers={"Authorization": f"Bearer {access_token}"}
         )
 
+        events_to_react = await client.get(
+            f"{settings.API_URL}/events/events-to-react",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
     if response.status_code == status.HTTP_401_UNAUTHORIZED:
         return RedirectResponse(
             url="/login",
@@ -618,6 +789,17 @@ async def profile(
             status_code=response.status_code,
             detail=response.text
         )
+
+    if events_to_react.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=events_to_react.status_code,
+            detail=events_to_react.text
+        )
+
+    events_to_react = events_to_react.json()
+
+    if not events_to_react:
+        events_to_react = []
 
     user = response.json()
 
@@ -636,7 +818,8 @@ async def profile(
         context={
             "request": request,
             "user": user,
-            "api_url": settings.API_URL
+            "api_url": settings.API_URL,
+            "events_to_react": events_to_react
         }
     )
 

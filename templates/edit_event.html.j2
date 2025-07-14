@@ -1,0 +1,73 @@
+{% extends "base.html.j2" %}
+
+{% block title %}{{ event.name }}{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
+{% endblock head %}
+
+{% block header_nav %}
+{% endblock header_nav %}
+
+{% block main %}
+<div class="login-container">
+    <div class="login-form">
+        <div class="login-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-plus">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5" />
+                <path d="M16 3v4" />
+                <path d="M8 3v4" />
+                <path d="M4 11h16" />
+                <path d="M16 19h6" />
+                <path d="M19 16v6" />
+            </svg>
+            <h1>Editar el Evento {{ event.name }}</h1>
+        </div>
+
+        <form id="event-form">
+            <label for="name">Nombre del Evento:</label>
+            <input type="text" id="name" name="name" placeholder="Nombre del Evento" value="{{ event.name }}">
+
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" rows="3"
+                placeholder="Descripción detallada del evento">{{ event.description }}</textarea>
+
+            <label for="location">Ubicación:</label>
+            <input type="text" id="location" name="location" placeholder="Lugar del evento"
+                value="{{ event.location }}">
+
+            <label for="maps_link">Enlace de Google Maps:</label>
+            <input type="url" id="maps_link" name="maps_link" placeholder="https://maps.app.goo.gl/xxxx"
+                value="{{ event.maps_link }}">
+
+            <label for="capacity">Capacidad Máxima:</label>
+            <input type="number" id="capacity" name="capacity" placeholder="Ej: 100" min="1"
+                value="{{ event.capacity }}">
+
+            <label for="capacity_type">Tipo de Capacidad:</label>
+            <select id="capacity_type" name="capacity_type">
+                <option value="limit_of_spaces" {% if event.capacity_type=='limit_of_spaces' %}selected{% endif %}>
+                    Límite de cupos</option>
+                <option value="site_capacity" {% if event.capacity_type=='site_capacity' %}selected{% endif %}>
+                    Capacidad del sitio</option>
+            </select>
+
+            <button class="a-button-filled-red" onclick="editEvent({{ event.id }})">Crear Evento</button>
+        </form>
+
+        <form id="event-img-form">
+            <label for="image">Imagen del Evento:</label>
+            <input type="file" id="image" name="image" accept="image/*">
+
+            <button class="a-button-filled-red" onclick="editImageEvent({{ event.id }})">Crear Evento</button>
+        </form>
+    </div>
+</div>
+{% endblock main %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/edit_event.js') }}"></script>
+{% endblock scripts %}
