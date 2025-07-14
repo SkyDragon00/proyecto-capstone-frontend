@@ -6,6 +6,8 @@
 {{ super() }}
 <!-- Asegúrate de cargar tu CSS de perfil -->
 <link rel="stylesheet" href="{{ url_for('static', path='css/profile-style.css') }}" />
+<!-- Profile management JavaScript -->
+<script src="{{ url_for('static', path='js/profile_manager.js') }}" defer></script>
 {% endblock head %}
 
 {% block header_nav %}
@@ -144,6 +146,107 @@
                 </div>
             </div>
             {% endif %}
+            
+            {# ————— Botones de Acción ————— #}
+            <div class="profile-actions">
+                <button type="button" class="btn btn-primary" onclick="toggleEditForm()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    Editar Perfil
+                </button>
+                
+                <button type="button" class="btn btn-danger" onclick="confirmDeleteProfile()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"/>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    </svg>
+                    Eliminar Perfil
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    {# ————— Formulario de Edición (Oculto por defecto) ————— #}
+    <div id="editForm" class="edit-form-overlay" style="display: none;">
+        <div class="edit-form-container">
+            <div class="edit-form-header">
+                <h2>Editar Perfil</h2>
+                <button type="button" class="close-btn" onclick="toggleEditForm()">&times;</button>
+            </div>
+            
+            <form id="profileEditForm" method="post" action="/profile/update">
+                
+                <div class="form-group">
+                    <label for="edit_first_name">Nombre:</label>
+                    <input type="text" id="edit_first_name" name="first_name" 
+                           value="{{ user.first_name }}" placeholder="Nuevo nombre">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_last_name">Apellido:</label>
+                    <input type="text" id="edit_last_name" name="last_name" 
+                           value="{{ user.last_name }}" placeholder="Nuevo apellido">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_email">Email:</label>
+                    <input type="email" id="edit_email" name="email" 
+                           value="{{ user.email }}" placeholder="Nuevo email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_password">Nueva Contraseña:</label>
+                    <input type="password" id="edit_password" name="password" 
+                           placeholder="Dejar vacío para mantener la actual">
+                </div>
+                
+                {% if user.role == 'assistant' and user.assistant %}
+                <div class="form-group">
+                    <label for="edit_phone">Teléfono:</label>
+                    <input type="tel" id="edit_phone" name="phone" 
+                           value="{{ user.assistant.phone }}" placeholder="Nuevo teléfono">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_id_number">Cédula/Pasaporte:</label>
+                    <input type="text" id="edit_id_number" name="id_number" 
+                           value="{{ user.assistant.id_number }}" 
+                           placeholder="Ej: 1234567890 o A1234567"
+                           title="Ingrese una cédula ecuatoriana (10 dígitos) o un pasaporte (1-3 letras seguidas de 5-7 dígitos)">
+                    <small class="field-help">Formato: Cédula ecuatoriana (10 dígitos) o Pasaporte (ej: A1234567)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_gender">Género:</label>
+                    <select id="edit_gender" name="gender">
+                        <option value="">Seleccionar género</option>
+                        <option value="male" {% if user.assistant.gender == 'male' %}selected{% endif %}>Masculino</option>
+                        <option value="female" {% if user.assistant.gender == 'female' %}selected{% endif %}>Femenino</option>
+                        <option value="other" {% if user.assistant.gender == 'other' %}selected{% endif %}>Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_date_of_birth">Fecha de nacimiento:</label>
+                    <input type="date" id="edit_date_of_birth" name="date_of_birth" 
+                           value="{{ user.assistant.date_of_birth }}" placeholder="Nueva fecha de nacimiento">
+                </div>
+                {% endif %}
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="toggleEditForm()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
         </div>
 
         {# ————— Columna Datos ————— #}
@@ -168,6 +271,362 @@
         </div>
     </div>
 </div>
+
+<style>
+.profile-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.edit-form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-form-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.edit-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-group input.error,
+.form-group select.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+.field-error {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+.field-help {
+    color: #6c757d;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+    font-style: italic;
+}
+
+.form-group {
+    position: relative;
+}
+
+/* Loading states */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn.loading::after {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Improved form styling */
+.form-group label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.form-group input:hover,
+.form-group select:hover {
+    border-color: #80bdff;
+}
+
+/* Better responsive design */
+@media (max-width: 768px) {
+    .edit-form-container {
+        width: 95%;
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+</style>
+
+<script>
+function toggleEditForm() {
+    const editForm = document.getElementById('editForm');
+    if (editForm.style.display === 'none' || editForm.style.display === '') {
+        editForm.style.display = 'flex';
+    } else {
+        editForm.style.display = 'none';
+    }
+}
+
+function confirmDeleteProfile() {
+    if (confirm('¿Estás seguro de que deseas eliminar tu perfil? Esta acción no se puede deshacer.')) {
+        deleteProfile();
+    }
+}
+
+async function deleteProfile() {
+    try {
+        const response = await fetch('/profile', {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            alert(result.message || 'Perfil eliminado con éxito');
+            // Redireccionar al logout
+            window.location.href = '/logout';
+        } else {
+            const error = await response.json();
+            alert('Error al eliminar el perfil: ' + (error.detail || 'Error desconocido'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al eliminar el perfil. Por favor, inténtalo de nuevo.');
+    }
+}
+
+// Handle form submission with PATCH method
+document.getElementById('profileEditForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    // Remover campos vacíos para evitar sobrescribir con valores vacíos
+    const fieldsToCheck = ['first_name', 'last_name', 'email', 'password'];
+    {% if user.role == 'assistant' %}
+    fieldsToCheck.push('phone', 'id_number', 'gender', 'date_of_birth');
+    {% endif %}
+    
+    for (const field of fieldsToCheck) {
+        if (!formData.get(field) || formData.get(field).trim() === '') {
+            formData.delete(field);
+        }
+    }
+    
+    // Log para debug
+    console.log('Form data being sent:');
+    for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+    }
+    
+    try {
+        const response = await fetch('/profile/update', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            // Si la respuesta es exitosa, recargar la página
+            alert('Perfil actualizado con éxito');
+            window.location.reload();
+        } else {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            try {
+                const errorJson = JSON.parse(errorText);
+                const errorDetail = errorJson.detail || errorText;
+                alert('Error al actualizar el perfil: ' + (typeof errorDetail === 'object' ? JSON.stringify(errorDetail) : errorDetail));
+            } catch {
+                alert('Error al actualizar el perfil: ' + errorText);
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al actualizar el perfil. Por favor, inténtalo de nuevo.');
+    }
+});
+
+// Close form when clicking outside
+document.getElementById('editForm').addEventListener('click', function(e) {
+    if (e.target === this) {
+        toggleEditForm();
+    }
+});
+
+// Add real-time validation for ID number
+document.getElementById('edit_id_number').addEventListener('input', function(e) {
+    const value = e.target.value.trim();
+    const helpText = e.target.nextElementSibling;
+    
+    if (value === '') {
+        e.target.style.borderColor = '';
+        helpText.textContent = 'Formato: Cédula ecuatoriana (10 dígitos) o Pasaporte (ej: A1234567)';
+        helpText.style.color = '#6c757d';
+        return;
+    }
+    
+    // Validate format
+    const ecuadorianIdPattern = /^\d{10}$/;
+    const passportPattern = /^[A-Z]{1,3}\d{5,7}$/i;
+    const passportNumericPattern = /^\d{6,9}$/;
+    
+    if (ecuadorianIdPattern.test(value) || 
+        passportPattern.test(value) || 
+        passportNumericPattern.test(value)) {
+        e.target.style.borderColor = '#28a745';
+        helpText.textContent = '✓ Formato válido';
+        helpText.style.color = '#28a745';
+    } else {
+        e.target.style.borderColor = '#dc3545';
+        helpText.textContent = '⚠ Formato inválido. Use cédula (10 dígitos) o pasaporte (ej: A1234567)';
+        helpText.style.color = '#dc3545';
+    }
+});
+</script>
 {% endblock main %}
 
 {% block scripts %}
