@@ -3,8 +3,7 @@
 {% block title %}Todos los eventos{% endblock title %}
 
 {% block head %}
-{#
-<link rel="stylesheet" href="{{ url_for('static', path='css/.css') }}" /> #}
+<link rel="stylesheet" href="{{ url_for('static', path='css/table-style.css') }}" />
 {% endblock head %}
 
 {% block header_nav %}
@@ -20,41 +19,75 @@
 {% endblock header_nav %}
 
 {% block main %}
-<a href="/create-event" class="a-button-filled-red">Crear Evento</a>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Ubicación</th>
-            <th>Enlace de Google Maps</th>
-            <th>Capacidad</th>
-            <th>Fecha de Creación</th>
-            <th>Publicado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for event in events %}
-        <tr>
-            <td>{{ event.id }}</td>
-            <td>{{ event.name }}</td>
-            <td>{{ event.description }}</td>
-            <td>{{ event.location }}</td>
-            <td><a href="{{ event.maps_link }}" target="_blank">Ver en Maps</a></td>
-            <td>{{ event.capacity }}</td>
-            <td>{{ event.created_at|strftime }}</td>
-            <td>{{ 'Sí' if event.is_published else 'No' }}</td>
-            <td>
-                <a href="/edit-event/{{ event.id }}">Editar</a> |
-                <button onclick="deleteEvent({{ event.id }})">Eliminar</button> |
-                <a href="/{{ event.id }}/event-dates">Ver Fechas</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<section class="upcoming-events">
+    <div class="flex-center justify-between">
+        <h2>Gestión de Eventos</h2>
+        <a href="/create-event" class="a-button-filled-red">Crear Evento</a>
+    </div>
+    
+    {% if events %}
+        <div class="staff-table-container">
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Ubicación</th>
+                        <th>Enlace de Google Maps</th>
+                        <th>Capacidad</th>
+                        <th>Fecha de Creación</th>
+                        <th>Publicado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>                <tbody>
+                    {% for event in events %}
+                    <tr id="event-row-{{ event.id }}">
+                        <td>{{ event.id }}</td>
+                        <td>{{ event.name }}</td>
+                        <td>{{ event.description }}</td>
+                        <td>{{ event.location }}</td>
+                        <td><a href="{{ event.maps_link }}" target="_blank">Ver en Maps</a></td>
+                        <td>{{ event.capacity }}</td>
+                        <td>{{ event.created_at|strftime }}</td>
+                        <td>{{ 'Sí' if event.is_published else 'No' }}</td>
+                        <td>
+                            <div class="actions">
+                                <a href="/edit-event/{{ event.id }}" class="btn-edit" title="Editar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                                        <path d="m15 5 4 4"/>
+                                    </svg>
+                                </a>
+                                <button onclick="deleteEvent({{ event.id }})" class="btn-delete" title="Eliminar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 6h18"/>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c0-1 1-2 2-2v2"/>
+                                    </svg>
+                                </button>
+                                <a href="/{{ event.id }}/event-dates" class="btn-edit" title="Ver Fechas">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                                        <line x1="16" x2="16" y1="2" y2="6"/>
+                                        <line x1="8" x2="8" y1="2" y2="6"/>
+                                        <line x1="3" x2="21" y1="10" y2="10"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="no-staff">
+            <p>No hay eventos registrados.</p>
+            <a href="/create-event" class="a-button-filled-red">Crear primer evento</a>
+        </div>
+    {% endif %}
+</section>
 {% endblock main %}
 
 {% block scripts %}

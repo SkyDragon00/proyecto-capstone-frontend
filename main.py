@@ -1825,8 +1825,9 @@ async def edit_organizer_form(
     """
 
     async with httpx.AsyncClient() as client:
+        # Primero obtenemos todos los organizadores
         response = await client.get(
-            f"{settings.API_URL}/organizer/{organizer_id}",
+            f"{settings.API_URL}/organizer/all",
             headers={"Authorization": f"Bearer {access_token}"}
         )
 
@@ -1842,7 +1843,20 @@ async def edit_organizer_form(
             detail="Error al obtener los datos del organizador"
         )
 
-    organizer = response.json()
+    organizers = response.json()
+    
+    # Buscamos el organizador específico por ID
+    organizer = None
+    for org in organizers:
+        if org.get("id") == organizer_id:
+            organizer = org
+            break
+    
+    if not organizer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organizador no encontrado"
+        )
 
     return templates.TemplateResponse(
         request=request,
