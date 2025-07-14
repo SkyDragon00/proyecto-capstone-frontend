@@ -20,6 +20,15 @@
 
 {% block main %}
 <div class="flex-center">
+    <div style="width: 100%;">
+        <label for="assistant_id">Ingrese la identificación del asistente:</label>
+        <input type="text" id="assistant_id" name="assistant_id" required>
+        <button class="a-button-filled-red" onclick="sendAttendance({{ event_date_id }}, {{ event_id }})">
+            Registrar
+        </button>
+    </div>
+</div>
+<div class="flex-center">
     <div id="capture-container">
         <form method="post" action="/record-assistant/{{ event_id }}/{{ event_date_id }}" id="capture-form"
             enctype="multipart/form-data">

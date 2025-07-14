@@ -64,6 +64,30 @@ async def home(
 
 
 @app.get(
+    "/terms",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the terms and conditions page"
+)
+async def terms(
+    request: Request,
+):
+    """Endpoint to retrieve the terms and conditions page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+
+    return templates.TemplateResponse(
+        request=request,
+        name="terms.html.j2",
+    )
+
+
+@app.get(
     "/event/image/{image_uuid}",
     response_class=FileResponse,
     summary="Endpoint to retrieve the event image",
@@ -255,6 +279,45 @@ async def record_assistant(
             "request": request,
             "event_id": event_id,
             "event_date_id": event_date_id,
+        }
+    )
+
+
+@app.get(
+    "/settings",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve the settings page"
+)
+async def settings(
+    request: Request,
+    settings: SettingsDependency
+):
+    """Endpoint to retrieve the settings page.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    app_settings = requests.get(f"{settings.API_URL}/organizer/get-settings")
+
+    if app_settings.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=app_settings.status_code,
+            detail="Error al obtener la configuración de la aplicación"
+        )
+
+    app_settings = app_settings.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="settings.html.j2",
+        context={
+            "request": request,
+            "api_url": settings.API_URL,
+            "app_settings": app_settings
         }
     )
 
