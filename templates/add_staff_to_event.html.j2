@@ -2,35 +2,83 @@
 
 {% block title %}Añadir un miembro al evento{% endblock title %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/table-style.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', path='css/add-staff.css') }}" />
+{% endblock head %}
+
 {% block header_nav %}
-<li>
-    <a href="/home">Home</a>
-</li>
-<li>
-    <a href="#">Eventos</a>
-</li>
-<li>
-    <a href="#">Contacto</a>
-</li>
+<li><a href="/home">Home</a></li>
+<li><a href="#">Eventos</a></li>
+<li><a href="#">Contacto</a></li>
 {% endblock header_nav %}
 
 {% block main %}
-<label for="staff-id">Selecciona un miembro del personal para añadir al evento:</label>
-<select id="staff-id">
-    <option value="">Selecciona un miembro del personal</option>
-    {% for staff in staff_list %}
-    <option value="{{ staff.id }}">{{ staff.email }}</option>
-    {% endfor %}
-</select>
+<section class="upcoming-events">
+    <div class="flex-center justify-between">
+        <h2>Asignar Personal a Evento</h2>
+        <a href="/staff" class="a-button-filled-red">Ver Personal</a>
+    </div>
+    
+    <div class="form-container">
+        <form id="staff-event-form">
+            <div class="form-group">
+                <label for="staff-id">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem; vertical-align: text-bottom;">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="m22 2-5 10-5-5 10-5z"/>
+                    </svg>
+                    Selecciona un miembro del personal:
+                </label>
+                <select id="staff-id" required>
+                    <option value="">Selecciona un miembro del personal</option>
+                    {% for staff in staff_list %}
+                    <option value="{{ staff.id }}">{{ staff.first_name }} {{ staff.last_name }} - {{ staff.email }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-<label for="event-id">Selecciona el evento:</label>
-<select id="event-id">
-    <option value="">Selecciona un evento</option>
-    {% for event in events_list %}
-    <option value="{{ event.id }}">{{ event.name }}</option>
-    {% endfor %}
-</select>
-<button id="add-staff-button" onclick="addStaffToEvent()">Añadir miembro al evento</button>
+            <div class="form-group">
+                <label for="event-id">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem; vertical-align: text-bottom;">
+                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                        <line x1="16" x2="16" y1="2" y2="6"/>
+                        <line x1="8" x2="8" y1="2" y2="6"/>
+                        <line x1="3" x2="21" y1="10" y2="10"/>
+                    </svg>
+                    Selecciona el evento:
+                </label>
+                <select id="event-id" required>
+                    <option value="">Selecciona un evento</option>
+                    {% for event in events_list %}
+                    <option value="{{ event.id }}">{{ event.name }} - {{ event.location }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="button" id="add-staff-button" class="btn-submit" onclick="addStaffToEvent()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem; vertical-align: text-bottom;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="m9 12 2 2 4-4"/>
+                </svg>
+                Asignar Personal al Evento
+            </button>
+        </form>
+    </div>
+    
+    {% if staff_list|length == 0 %}
+        <div class="no-staff">
+            <p>No hay personal disponible para asignar.</p>
+            <a href="/create-staff" class="a-button-filled-red">Crear Personal</a>
+        </div>
+    {% elif events_list|length == 0 %}
+        <div class="no-staff">
+            <p>No hay eventos disponibles.</p>
+            <a href="/create-event" class="a-button-filled-red">Crear Evento</a>
+        </div>
+    {% endif %}
+</section>
 {% endblock main %}
 
 {% block scripts %}
