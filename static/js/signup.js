@@ -15,8 +15,18 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
             if (response.ok) {
                 window.location.href = "/login";
             } else {
-                return response.text().then((errorText) => {
-                    alert("Error en el registro: " + errorText);
+                return response.json().then((errorText) => {
+                    if (
+                        errorText["detail"].includes(
+                            "Face could not be detected"
+                        )
+                    ) {
+                        alert(
+                            "No se pudo detectar un único rostro en la imagen. Por favor, asegúrate de que la imagen contenga un solo rostro claro y visible."
+                        );
+                    } else {
+                        alert("Error en el registro: " + errorText.detail);
+                    }
                 });
             }
         })

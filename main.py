@@ -318,7 +318,8 @@ async def settings(
         context={
             "request": request,
             "api_url": settings.API_URL,
-            "app_settings": app_settings
+            "app_settings": app_settings,
+            "default_message": ""
         }
     )
 
@@ -356,6 +357,10 @@ async def record_assistant_with_data(
 
     assistants = assistants.json()
 
+    # Verifica que si el json no es una lista, mandar una lista vacía
+    if not isinstance(assistants, list):
+        assistants = []
+
     return templates.TemplateResponse(
         request=request,
         name="record_assistant.html.j2",
@@ -364,7 +369,8 @@ async def record_assistant_with_data(
             "assistants": assistants,
             "event_id": event_id,
             "event_date_id": event_date_id,
-            "api_url": settings.API_URL
+            "api_url": settings.API_URL,
+            "default_message": "No se puede reconocer el rostro o no coincide con ningún asistente registrado."
         }
     )
 

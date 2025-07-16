@@ -19,7 +19,7 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
             .then((data) => {
                 assistantId = data.id;
                 alert(
-                    `Acompañante encontrado: ${data.first_name} ${data.last_name}.`
+                    `Asistente encontrado: ${data.first_name} ${data.last_name}.`
                 );
             })
             .catch((error) => {
@@ -30,6 +30,8 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
                 return;
             });
     }
+
+    alert(`Registrando asistencia para el asistente con ID: ${assistantId}`);
 
     await fetch(
         `http://127.0.0.1:8000/events/add/attendance/${eventDateId}/${eventId}/${assistantId}`,
