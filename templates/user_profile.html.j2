@@ -10,11 +10,6 @@
 <script src="{{ url_for('static', path='js/profile_manager.js') }}" defer></script>
 {% endblock head %}
 
-{% block header_nav %}
-<li><a href="#">Eventos</a></li>
-<li><a href="#">Contacto</a></li>
-{% endblock header_nav %}
-
 {% block main %}
 <div class="profile-container">
     <div class="profile-wrapper">
@@ -252,6 +247,7 @@
 
     </div>
     {# ————— Columna Datos ————— #}
+    {% if events_to_react%}
     <div class="events-column">
         <h2>Eventos Por Dar Una Reacción</h2>
         <ul class="events-list">
@@ -264,11 +260,12 @@
             {% endfor %}
         </ul>
     </div>
+    {% endif %}
 
     {# ————— Log Out ————— #}
-    <div class="log-out">
+    <div class="log-out" style="margin-top: 1rem;">
         <form action="/logout" method="get">
-            <button type="submit">Cerrar Sesión</button>
+            <button type="submit" class="a-button-outline-red">Cerrar Sesión</button>
         </form>
     </div>
 </div>

@@ -33,7 +33,9 @@
     <header>
         {# {% block header %}{% endblock header %} #}
         <div class="flex-center top-header">
-            <img src="{{ url_for('static', path='imgs/LogoUdlaColorTexto.png') }}" alt="Logo UDLA" height="36px" />
+            <a href="/home">
+                <img src="{{ url_for('static', path='imgs/LogoUdlaColorTexto.png') }}" alt="Logo UDLA" height="36px" />
+            </a>
 
             <div>
                 <a href="/profile" class="a-button-outline-red" style="--padding: 0.2rem 1rem;">
@@ -49,7 +51,40 @@
         </div>
         <nav class="bottom-header">
             <ul>
-                {% block header_nav %}{% endblock header_nav %}
+                {% block header_nav %}
+                {% if role == "organizer" %}
+                <li>
+                    <a href="/all-events-view">Administrar Eventos</a>
+                </li>
+                <li>
+                    <a href="/organizer">Administrar Organizadores</a>
+                </li>
+                <li>
+                    <a href="/staff">Administrar Staff</a>
+                </li>
+                <li>
+                    <a href="/staff-to-event">Añadir Staff a Evento</a>
+                </li>
+                <li>
+                    <a href="http://localhost:8501">Dashboard</a>
+                </li>
+                <li>
+                    <a href="/settings">Configuraciones</a>
+                </li>
+                {% elif role == "assistant" %}
+                <li>
+                    <a href="/events">Todos los eventos</a>
+                </li>
+                {% elif role == "staff" %}
+                <li>
+                    <a href="/select-event-to-record">Grabar Asistencia</a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="/events">Todos los eventos</a>
+                </li>
+                {% endif %}
+                {% endblock header_nav %}
             </ul>
         </nav>
     </header>

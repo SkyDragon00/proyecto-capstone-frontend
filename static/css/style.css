@@ -56,7 +56,7 @@ html {
                 a {
                     color: var(--white-color);
                     text-decoration: none;
-                    padding: 0 3rem;
+                    padding: 0 2rem;
                     border-right: 1px solid var(--white-color);
                 }
 

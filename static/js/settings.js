@@ -1,14 +1,13 @@
 function saveSettings() {
     const model = document.getElementById("model").value;
-    const threshold = document.getElementById("threshold").value;
+    let threshold = document.getElementById("threshold").value;
 
-    alert(`Guardando configuración: modelo=${model}, umbral=${threshold}`);
+    if (threshold === "") {
+        threshold = 0; // Valor por defecto si no se especifica
+    }
 
     fetch(
-        "http://127.0.0.1:8000/organizer/change-settings?model_name=" +
-            model +
-            "&threshold=" +
-            threshold,
+        `http://127.0.0.1:8000/organizer/change-settings?model_name=${model}&threshold=${threshold}`,
         {
             method: "PATCH",
             headers: {

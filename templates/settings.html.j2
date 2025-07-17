@@ -2,9 +2,6 @@
 
 {% block title %}Settings{% endblock title %}
 
-{% block header_nav %}
-{% endblock header_nav %}
-
 {% block main %}
 <div class="settings-container">
     <h1>Configuración de la Aplicación</h1>
@@ -26,8 +23,8 @@
         </select>
 
         <label for="threshold">Umbral de Confianza:</label>
-        <input type="number" id="threshold" name="threshold" value="{{ app_settings.threshold }}" step="0.01" required
-            max="1" min="0">
+        <input type="number" id="threshold" name="threshold" value="{{ app_settings.threshold }}" step="0.01" max="1"
+            min="0">
 
         <button class="a-button-filled-red" onclick="saveSettings()">Guardar Cambios</button>
     </form>

@@ -152,7 +152,10 @@ async def get_event_image(
     response_class=HTMLResponse,
     summary="Endpoint to retrieve the login page"
 )
-def login(request: Request):
+def login(
+    request: Request,
+    role: Annotated[str | None, Cookie()] = None
+):
     """Endpoint to retrieve the login page.
 
     \f
@@ -167,7 +170,8 @@ def login(request: Request):
         request=request,
         name="login.html.j2",
         context={
-            "request": request
+            "request": request,
+            "role": role,
         }
     )
 
@@ -233,6 +237,7 @@ def handle_login(
 )
 def signup(
     request: Request,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the signup page.
 
@@ -248,7 +253,8 @@ def signup(
         request=request,
         name="signup.html.j2",
         context={
-            "request": request
+            "request": request,
+            "role": role,
         }
     )
 
@@ -291,7 +297,8 @@ async def record_assistant(
 )
 async def settings(
     request: Request,
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the settings page.
 
@@ -319,7 +326,8 @@ async def settings(
             "request": request,
             "api_url": settings.API_URL,
             "app_settings": app_settings,
-            "default_message": ""
+            "default_message": "",
+            "role": role,
         }
     )
 
@@ -761,8 +769,9 @@ async def add_companion(
 )
 async def profile(
     request: Request,
-    access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    access_token: Annotated[str | None, Cookie()] = None,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the profile page.
 
@@ -773,6 +782,11 @@ async def profile(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if access_token is None:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -826,7 +840,8 @@ async def profile(
             "request": request,
             "user": user,
             "api_url": settings.API_URL,
-            "events_to_react": events_to_react
+            "events_to_react": events_to_react,
+            "role": role,
         }
     )
 
@@ -1852,14 +1867,14 @@ async def edit_organizer_form(
         )
 
     organizers = response.json()
-    
+
     # Buscamos el organizador específico por ID
     organizer = None
     for org in organizers:
         if org.get("id") == organizer_id:
             organizer = org
             break
-    
+
     if not organizer:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
