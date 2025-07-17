@@ -6,10 +6,12 @@
 <link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
 {% endblock head %}
 
-{% block header_nav %}
-{% endblock header_nav %}
-
 {% block main %}
+<video autoplay loop muted playsinline id="bg-video">
+    <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+</video>
+
 <div class="login-container">
     <div class="login-form">
         <div class="login-header">
@@ -29,23 +31,23 @@
 
         <form id="event-form">
             <label for="name">Nombre del Evento:</label>
-            <input type="text" id="name" name="name" placeholder="Nombre del Evento" value="{{ event.name }}">
+            <input type="text" id="name" name="name" placeholder="Nombre del Evento" value="{{ event.name }}" required>
 
             <label for="description">Descripción:</label>
-            <textarea id="description" name="description" rows="3"
+            <textarea id="description" name="description" rows="3" required
                 placeholder="Descripción detallada del evento">{{ event.description }}</textarea>
 
             <label for="location">Ubicación:</label>
-            <input type="text" id="location" name="location" placeholder="Lugar del evento"
-                value="{{ event.location }}">
+            <input type="text" id="location" name="location" placeholder="Lugar del evento" value="{{ event.location }}"
+                required>
 
             <label for="maps_link">Enlace de Google Maps:</label>
             <input type="url" id="maps_link" name="maps_link" placeholder="https://maps.app.goo.gl/xxxx"
-                value="{{ event.maps_link }}">
+                value="{{ event.maps_link }}" required>
 
             <label for="capacity">Capacidad Máxima:</label>
             <input type="number" id="capacity" name="capacity" placeholder="Ej: 100" min="1"
-                value="{{ event.capacity }}">
+                value="{{ event.capacity }}" required>
 
             <label for="capacity_type">Tipo de Capacidad:</label>
             <select id="capacity_type" name="capacity_type">
@@ -55,14 +57,15 @@
                     Capacidad del sitio</option>
             </select>
 
-            <button class="a-button-filled-red" onclick="editEvent({{ event.id }})">Crear Evento</button>
+            <button class="a-button-filled-red" onclick="editEvent({{ event.id }})">Editar Evento</button>
         </form>
 
         <form id="event-img-form">
             <label for="image">Imagen del Evento:</label>
-            <input type="file" id="image" name="image" accept="image/*">
+            <input type="file" id="image" name="image" accept="image/*" required>
 
-            <button class="a-button-filled-red" onclick="editImageEvent({{ event.id }})">Crear Evento</button>
+            <button class="a-button-filled-red" onclick="editImageEvent({{ event.id }})"
+                style="margin-bottom: 2rem;">Actualizar Imagen</button>
         </form>
     </div>
 </div>

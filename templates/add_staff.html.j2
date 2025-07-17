@@ -7,18 +7,6 @@
 <script src="{{ url_for('static', path='js/staff_operations.js') }}"></script>
 {% endblock head %}
 
-{% block header_nav %}
-<li>
-    <a href="/home">Home</a>
-</li>
-<li>
-    <a href="#">Eventos</a>
-</li>
-<li>
-    <a href="#">Contacto</a>
-</li>
-{% endblock header_nav %}
-
 {% block main %}
 <video autoplay loop muted playsinline id="bg-video">
     <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
@@ -62,7 +50,7 @@
             <label for="confirm_password">Confirmar Contraseña:</label>
             <input type="password" id="confirm_password" name="confirm_password" required placeholder="••••••••">
 
-            <button type="submit" class="a-button-filled-red">Registrarse</button>
+            <button type="submit" class="a-button-filled-red" style="margin-bottom: 2rem;">Registrarse</button>
         </form>
     </div>
 </div>

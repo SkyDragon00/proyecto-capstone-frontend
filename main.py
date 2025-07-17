@@ -201,6 +201,12 @@ def handle_login(
         data=form.model_dump()
     )
 
+    if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     if response.status_code != status.HTTP_200_OK:
         raise HTTPException(
             status_code=response.status_code,
@@ -563,7 +569,8 @@ async def edit_event(
         )
     ],
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the edit event page.
 
@@ -607,7 +614,8 @@ async def edit_event(
         name="edit_event.html.j2",
         context={
             "request": request,
-            "event": event
+            "event": event,
+            "role": role,
         }
     )
 
@@ -1228,7 +1236,8 @@ async def delete_profile(
 async def create_staff(
     request: Request,
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the create staff page.
 
@@ -1245,6 +1254,7 @@ async def create_staff(
         name="add_staff.html.j2",
         context={
             "request": request,
+            "role": role,
         }
     )
 
@@ -1261,7 +1271,7 @@ async def handle_create_staff(
         Form()
     ],
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
 ):
     """Endpoint to handle create staff form submission.
 
@@ -1292,7 +1302,7 @@ async def handle_create_staff(
         )
 
     return RedirectResponse(
-        url="/home",
+        url="/staff",
         status_code=status.HTTP_303_SEE_OTHER
     )
 
@@ -1305,7 +1315,8 @@ async def handle_create_staff(
 async def staff_list(
     request: Request,
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the staff management page with all staff members.
 
@@ -1347,7 +1358,8 @@ async def staff_list(
         context={
             "request": request,
             "staff_members": staff_members,
-            "api_url": settings.API_URL
+            "api_url": settings.API_URL,
+            "role": role,
         }
     )
 
@@ -1361,7 +1373,8 @@ async def edit_staff_form(
     request: Request,
     staff_id: Annotated[int, Path()],
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the edit staff page.
 
@@ -1413,7 +1426,8 @@ async def edit_staff_form(
         name="edit_staff.html.j2",
         context={
             "request": request,
-            "staff_member": staff_member
+            "staff_member": staff_member,
+            "role": role,
         }
     )
 
@@ -2046,7 +2060,8 @@ async def delete_organizer(
 async def create_event_page(
     request: Request,
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the create event page.
 
@@ -2067,6 +2082,7 @@ async def create_event_page(
         name="add_event.html.j2",
         context={
             "request": request,
+            "role": role,
         }
     )
 
@@ -2140,7 +2156,7 @@ async def handle_create_event(
         )
 
     return RedirectResponse(
-        url="/events",  # Or perhaps a detail page for the newly created event
+        url="/all-events-view",  # Or perhaps a detail page for the newly created event
         status_code=status.HTTP_303_SEE_OTHER
     )
 
@@ -2152,7 +2168,8 @@ async def handle_create_event(
 )
 async def all_events_view(
     request: Request,
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None
 ):
     """Endpoint to retrieve the all events view page.
 
@@ -2172,12 +2189,16 @@ async def all_events_view(
     if not events:
         events = []
 
+    if not isinstance(events, list):
+        events = []
+
     return templates.TemplateResponse(
         request=request,
         name="all_events_view.html.j2",
         context={
             "request": request,
-            "events": events
+            "events": events,
+            "role": role,
         }
     )
 
