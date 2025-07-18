@@ -6,21 +6,6 @@
 <link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
 {% endblock head %}
 
-{% block header_nav %}
-<li>
-    <a href="/home">Home</a>
-</li>
-<li>
-    <a href="/organizer">Organizadores</a>
-</li>
-<li>
-    <a href="#">Eventos</a>
-</li>
-<li>
-    <a href="#">Contacto</a>
-</li>
-{% endblock header_nav %}
-
 {% block main %}
 <video autoplay loop muted playsinline id="bg-video">
     <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
@@ -46,11 +31,13 @@
             <div class="input-group">
                 <div>
                     <label for="first_name">Nombre:</label>
-                    <input type="text" id="first_name" name="first_name" value="{{ organizer.first_name }}" placeholder="Nombre">
+                    <input type="text" id="first_name" name="first_name" value="{{ organizer.first_name }}"
+                        placeholder="Nombre">
                 </div>
                 <div>
                     <label for="last_name">Apellido:</label>
-                    <input type="text" id="last_name" name="last_name" value="{{ organizer.last_name }}" placeholder="Apellido">
+                    <input type="text" id="last_name" name="last_name" value="{{ organizer.last_name }}"
+                        placeholder="Apellido">
                 </div>
             </div>
 

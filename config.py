@@ -9,10 +9,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     API_URL: str = Field(
-        default="http://127.0.0.1:8000",
+        default="https://proyecto-capstone-backend.onrender.com",
         title="Base URL for the API",
         description="Base URL for the API, used for making requests to the backend service.",
-        examples=["http://127.0.0.1:8000", "http://backend:8000"]
+        examples=["https://proyecto-capstone-backend.onrender.com",
+                  "http://backend:8000"]
     )
 
     model_config = SettingsConfigDict(

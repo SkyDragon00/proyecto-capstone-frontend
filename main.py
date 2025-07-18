@@ -286,6 +286,12 @@ async def record_assistant(
     :rtype: _TemplateResponse
     """
 
+    if role != "staff":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     return templates.TemplateResponse(
         request=request,
         name="record_assistant.html.j2",
@@ -317,6 +323,12 @@ async def settings(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     app_settings = requests.get(f"{settings.API_URL}/organizer/get-settings")
 
     if app_settings.status_code != status.HTTP_200_OK:
@@ -350,6 +362,7 @@ async def record_assistant_with_data(
     settings: SettingsDependency,
     event_id: Annotated[int, Path()],
     event_date_id: Annotated[int, Path()],
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to handle the recording of an assistant.
 
@@ -362,6 +375,12 @@ async def record_assistant_with_data(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     file = {
         "image": (image.filename, await image.read(), image.content_type)
     }
@@ -386,7 +405,8 @@ async def record_assistant_with_data(
             "event_id": event_id,
             "event_date_id": event_date_id,
             "api_url": settings.API_URL,
-            "default_message": "No se puede reconocer el rostro o no coincide con ningún asistente registrado."
+            "default_message": "No se puede reconocer el rostro o no coincide con ningún asistente registrado.",
+            "role": role,
         }
     )
 
@@ -450,6 +470,12 @@ async def select_event_to_record(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+
+    if role != "staff":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -609,6 +635,12 @@ async def edit_event(
     :rtype: _TemplateResponse
     """
 
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"{settings.API_URL}/events/{event_id}",
@@ -754,7 +786,8 @@ async def add_companion(
     request: Request,
     event_id: Annotated[int, Path()],
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the add companion page.
 
@@ -765,6 +798,12 @@ async def add_companion(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "assistant":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     response = requests.get(
         f"{settings.API_URL}/events/{event_id}",
         headers={"Authorization": f"Bearer {access_token}"}
@@ -1274,6 +1313,12 @@ async def create_staff(
     :rtype: _TemplateResponse
     """
 
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     return templates.TemplateResponse(
         request=request,
         name="add_staff.html.j2",
@@ -1357,6 +1402,12 @@ async def staff_list(
     :rtype: _TemplateResponse
     """
 
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"{settings.API_URL}/staff/all",
@@ -1416,6 +1467,12 @@ async def edit_staff_form(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     async with httpx.AsyncClient() as client:
         # Obtener información del staff específico
@@ -1637,6 +1694,12 @@ async def organizer_list(
     :rtype: _TemplateResponse
     """
 
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"{settings.API_URL}/organizer/all",
@@ -1677,7 +1740,8 @@ async def organizer_list(
 async def create_organizer(
     request: Request,
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the create organizer page.
 
@@ -1688,12 +1752,18 @@ async def create_organizer(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     return templates.TemplateResponse(
         request=request,
         name="add_organizer.html.j2",
         context={
             "request": request,
+            "role": role,
         }
     )
 
@@ -1758,7 +1828,7 @@ async def handle_create_organizer(
     email: Annotated[str, Form()],
     password: Annotated[str, Form()],
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
 ):
     """Endpoint to handle create organizer form submission.
 
@@ -1870,7 +1940,8 @@ async def edit_organizer_form(
     request: Request,
     organizer_id: Annotated[int, Path()],
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the edit organizer page.
 
@@ -1887,6 +1958,11 @@ async def edit_organizer_form(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     async with httpx.AsyncClient() as client:
         # Primero obtenemos todos los organizadores
@@ -1928,7 +2004,8 @@ async def edit_organizer_form(
         context={
             "request": request,
             "organizer": organizer,
-            "organizer_id": organizer_id
+            "organizer_id": organizer_id,
+            "role": role,
         }
     )
 
@@ -2099,6 +2176,11 @@ async def create_event_page(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     # Check if the user is an organizer
     # This is a placeholder, replace with actual logic to check user role
@@ -2207,6 +2289,11 @@ async def all_events_view(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{settings.API_URL}/events/all")
@@ -2286,6 +2373,11 @@ async def event_dates_view(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{settings.API_URL}/events/{event_id}/dates")
@@ -2328,6 +2420,11 @@ async def create_event_date_page(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     return templates.TemplateResponse(
         request=request,
@@ -2424,6 +2521,11 @@ async def add_staff_to_event_page(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     # Envía todos los staff al template y también todos los eventos
     async with httpx.AsyncClient() as client:

@@ -1,6 +1,6 @@
 async function sendAttendance(eventDateId, eventId, assistantId) {
     //    curl -X 'POST' \
-    //   'http://127.0.0.1:8000/events/add/attendance/1/5/3' \
+    //   'https://proyecto-capstone-backend.onrender.com/events/add/attendance/1/5/3' \
     //   -H 'accept: application/json' \
     //   -d ''
     if (!assistantId) {
@@ -8,7 +8,7 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
             document.getElementById("assistant_id").value;
 
         await fetch(
-            `http://127.0.0.1:8000/assistant/get-by-id-number/${assistantIdentification}`
+            `https://proyecto-capstone-backend.onrender.com/assistant/get-by-id-number/${assistantIdentification}`
         )
             .then((response) => {
                 if (!response.ok) {
@@ -34,7 +34,7 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
     alert(`Registrando asistencia para el asistente con ID: ${assistantId}`);
 
     await fetch(
-        `http://127.0.0.1:8000/events/add/attendance/${eventDateId}/${eventId}/${assistantId}`,
+        `https://proyecto-capstone-backend.onrender.com/events/add/attendance/${eventDateId}/${eventId}/${assistantId}`,
         {
             method: "POST",
             headers: {
