@@ -3,22 +3,47 @@
 {% block title %}Registrar Asistencia{% endblock title %}
 
 {% block head %}
-{#
-<link rel="stylesheet" href="{{ url_for('static', path='css/.css') }}" /> #}
+<link rel="stylesheet" href="{{ url_for('static', path='css/select-events-to-record.css') }}" />
 {% endblock head %}
 
-{% block main %}
-<ul class="list-upcoming-events">
-    <h1>Selecciona un Evento para Registrar Asistencia</h1>
-    <p>Se te ha asignado a estos eventos</p>
-    {% for event in events %}
-    <li>
-        <h2>{{ event.name }}</h2>
+{% block header_nav %}
+<li>
+    <a href="/home">Home</a>
+</li>
+<li>
+    <a href="#">Eventos</a>
+</li>
+<li>
+    <a href="#">Contacto</a>
+</li>
+{% endblock header_nav %}
 
-        {% for date in event.event_dates %}
-        <a href="/record-assistant/{{ event.id }}/{{ date.id }}">{{ date.day_date }}</a>
+{% block main %}
+<div class="select-events-container">
+    <h1 class="page-title">Seleccionar Evento</h1>
+    <p class="page-subtitle">Elige el evento y la fecha para registrar la asistencia</p>
+    
+    {% if events %}
+    <ul class="list-upcoming-events">
+        {% for event in events %}
+        <li class="event-card">
+            <h2 class="event-title">{{ event.name }}</h2>
+            
+            <div class="event-dates-container">
+                {% for date in event.event_dates %}
+                <a href="/record-assistant/{{ event.id }}/{{ date.id }}" class="event-date-link">
+                    📅 {{ date.day_date }}
+                </a>
+                {% endfor %}
+            </div>
+        </li>
         {% endfor %}
-    </li>
-    {% endfor %}
-</ul>
+    </ul>
+    {% else %}
+    <div class="no-events-message">
+        <i>📅</i>
+        <p>No hay eventos disponibles para registrar asistencia en este momento.</p>
+    </div>
+    {% endif %}
+</div>
 {% endblock main %}
