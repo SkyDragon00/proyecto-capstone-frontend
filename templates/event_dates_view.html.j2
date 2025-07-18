@@ -7,18 +7,6 @@
 <link rel="stylesheet" href="{{ url_for('static', path='css/.css') }}" /> #}
 {% endblock head %}
 
-{% block header_nav %}
-<li>
-    <a href="/home">Home</a>
-</li>
-<li>
-    <a href="#">Eventos</a>
-</li>
-<li>
-    <a href="#">Contacto</a>
-</li>
-{% endblock header_nav %}
-
 {% block main %}
 <a href="/{{ event_id }}/create-date" class="a-button-filled-red">Añadir Fecha</a>
 <table>
@@ -39,7 +27,6 @@
             <td>{{ date.start_time }}</td>
             <td>{{ date.end_time }}</td>
             <td>
-                <a href="/edit-date/{{ date.id }}">Editar</a> |
                 <button onclick="deleteDate({{ date.id }})">Eliminar</button>
             </td>
         </tr>

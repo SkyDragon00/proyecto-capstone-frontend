@@ -55,3 +55,38 @@
     </div>
 </div>
 {% endblock main %}
+
+{% block scripts %}
+<script>
+    document.getElementById('login-form').addEventListener('submit', function (event) {
+        const firstName = document.getElementById('first_name').value.trim();
+        const lastName = document.getElementById('last_name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const confirmPassword = document.getElementById('confirm_password').value.trim();
+
+        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+            event.preventDefault();
+            alert('Por favor, complete todos los campos.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            event.preventDefault();
+            alert('Las contraseñas no coinciden.');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            event.preventDefault();
+            alert('Por favor, introduce un email válido y este debe ser de la UDLA (udla.edu.ec).');
+            return;
+        }
+    });
+
+    function isValidEmail(email) {
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@udla\.edu\.ec$/;
+        return emailPattern.test(email);
+    }
+</script>
+{% endblock scripts %}

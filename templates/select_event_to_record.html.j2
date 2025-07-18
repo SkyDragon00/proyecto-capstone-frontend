@@ -7,20 +7,10 @@
 <link rel="stylesheet" href="{{ url_for('static', path='css/.css') }}" /> #}
 {% endblock head %}
 
-{% block header_nav %}
-<li>
-    <a href="/home">Home</a>
-</li>
-<li>
-    <a href="#">Eventos</a>
-</li>
-<li>
-    <a href="#">Contacto</a>
-</li>
-{% endblock header_nav %}
-
 {% block main %}
 <ul class="list-upcoming-events">
+    <h1>Selecciona un Evento para Registrar Asistencia</h1>
+    <p>Se te ha asignado a estos eventos</p>
     {% for event in events %}
     <li>
         <h2>{{ event.name }}</h2>

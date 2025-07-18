@@ -274,6 +274,7 @@ async def record_assistant(
     request: Request,
     event_id: Annotated[int, Path()],
     event_date_id: Annotated[int, Path()],
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the record assistant page.
 
@@ -292,6 +293,7 @@ async def record_assistant(
             "request": request,
             "event_id": event_id,
             "event_date_id": event_date_id,
+            "role": role,
         }
     )
 
@@ -397,6 +399,7 @@ async def record_assistant_with_data(
 async def events(
     request: Request,
     settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the events page with upcoming events.
 
@@ -421,7 +424,8 @@ async def events(
         name="events.html.j2",
         context={
             "request": request,
-            "events": events
+            "events": events,
+            "role": role,
         }
     )
 
@@ -433,7 +437,9 @@ async def events(
 )
 async def select_event_to_record(
     request: Request,
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    access_token: Annotated[str, Cookie()],
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the select event to record page.
 
@@ -446,19 +452,26 @@ async def select_event_to_record(
     """
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(f"{settings.API_URL}/events/upcoming")
+        response = await client.get(
+            f"{settings.API_URL}/staff/my-events",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
 
     events = response.json()
 
     if not events:
         events = []  # or handle the empty case as needed
 
+    if not isinstance(events, list):
+        events = []
+
     return templates.TemplateResponse(
         request=request,
         name="select_event_to_record.html.j2",
         context={
             "request": request,
-            "events": events
+            "events": events,
+            "role": role
         }
     )
 
@@ -477,8 +490,8 @@ async def event_detail(
             description="The ID of the event to retrieve details for",
         )
     ],
-    access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    access_token: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the event detail page.
 
@@ -492,6 +505,12 @@ async def event_detail(
     :rtype: _TemplateResponse
     """
     # Si no hay token debería redirigir a la página de login
+
+    if not access_token:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -531,9 +550,15 @@ async def event_detail(
 
     registered_events_ids = []
 
-    for registered_event in response.json():
-        registered_events_ids.append(  # type: ignore
-            registered_event["event_id"]
+    try:
+        for registered_event in response.json():
+            registered_events_ids.append(  # type: ignore
+                registered_event["event_id"]
+            )
+    except TypeError:
+        return RedirectResponse(
+            "/all-events-view",
+            status_code=status.HTTP_303_SEE_OTHER
         )
 
     role = None
@@ -1595,7 +1620,8 @@ async def delete_staff(
 async def organizer_list(
     request: Request,
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the organizers management page with all organizers.
 
@@ -1637,7 +1663,8 @@ async def organizer_list(
         context={
             "request": request,
             "organizers": organizers,
-            "api_url": settings.API_URL
+            "api_url": settings.API_URL,
+            "role": role,
         }
     )
 
@@ -2245,7 +2272,8 @@ async def staff(
 async def event_dates_view(
     request: Request,
     event_id: int,
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the event dates page.
 
@@ -2271,6 +2299,7 @@ async def event_dates_view(
             "request": request,
             "event_dates": event_dates,
             "event_id": event_id,
+            "role": role,
         }
     )
 
@@ -2285,7 +2314,8 @@ async def create_event_date_page(
     request: Request,
     event_id: int,
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the create event date page.
 
@@ -2305,6 +2335,7 @@ async def create_event_date_page(
         context={
             "request": request,
             "event_id": event_id,
+            "role": role,
         }
     )
 
@@ -2322,7 +2353,7 @@ async def handle_create_event_date(
     settings: SettingsDependency,
     day_date: Annotated[str, Form()],
     start_time: Annotated[str, Form()],
-    end_time: Annotated[str, Form()]
+    end_time: Annotated[str, Form()],
 ):
     """Endpoint to handle create event date form submission.
 
@@ -2381,7 +2412,8 @@ async def handle_create_event_date(
 async def add_staff_to_event_page(
     request: Request,
     access_token: Annotated[str, Cookie()],
-    settings: SettingsDependency
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the add staff to event page.
 
@@ -2440,6 +2472,7 @@ async def add_staff_to_event_page(
         context={
             "request": request,
             "staff_list": staff,
-            "events_list": events
+            "events_list": events,
+            "role": role,
         }
     )

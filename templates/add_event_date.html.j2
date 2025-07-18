@@ -6,18 +6,6 @@
 <link rel="stylesheet" href="{{ url_for('static', path='css/login-style.css') }}" />
 {% endblock head %}
 
-{% block header_nav %}
-<li>
-    <a href="/home">Home</a>
-</li>
-<li>
-    <a href="/events">Eventos</a>
-</li>
-<li>
-    <a href="#">Contacto</a>
-</li>
-{% endblock header_nav %}
-
 {% block main %}
 <video autoplay loop muted playsinline id="bg-video">
     <source src="{{ url_for('static', path='videos/udla_park.mp4') }}" type="video/mp4">
@@ -51,8 +39,33 @@
             <label for="end_time">Hora de Fin:</label>
             <input type="time" id="end_time" name="end_time" required placeholder="Hora de Fin">
 
-            <button type="submit" class="a-button-filled-red">Crear Fecha</button>
+            <button type="submit" class="a-button-filled-red" style="margin-bottom: 2rem;">Crear Fecha</button>
         </form>
     </div>
 </div>
 {% endblock main %}
+
+{% block scripts %}
+<script>
+    document.getElementById('event-form').addEventListener('submit', function (event) {
+        const dayDate = document.getElementById('day_date').value;
+        const startTime = document.getElementById('start_time').value;
+        const endTime = document.getElementById('end_time').value;
+
+        const today = new Date();
+        const selectedDate = new Date(dayDate);
+
+        if (selectedDate < today) {
+            event.preventDefault();
+            alert('La fecha del evento debe ser futura.');
+            return;
+        }
+
+        if (startTime >= endTime) {
+            event.preventDefault();
+            alert('La hora de fin debe ser mayor a la hora de inicio.');
+            return;
+        }
+    });
+</script>
+{% endblock scripts %}
