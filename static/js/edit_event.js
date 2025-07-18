@@ -30,7 +30,7 @@ function editEvent(eventId) {
 
     const formData = new FormData(document.getElementById("event-form"));
 
-    fetch(`https://proyecto-capstone-backend.onrender.com/events/${eventId}`, {
+    fetch(`http://127.0.0.1:8000/events/${eventId}`, {
         method: "PATCH",
         // Envía como JSON
         body: JSON.stringify(Object.fromEntries(formData)),
@@ -50,13 +50,10 @@ function editEvent(eventId) {
 function editImageEvent(eventId) {
     const formData = new FormData(document.getElementById("event-img-form"));
 
-    fetch(
-        `https://proyecto-capstone-backend.onrender.com/events/${eventId}/image`,
-        {
-            method: "PATCH",
-            body: formData,
-        }
-    ).then((response) => {
+    fetch(`http://127.0.0.1:8000/events/${eventId}/image`, {
+        method: "PATCH",
+        body: formData,
+    }).then((response) => {
         if (response.ok) {
             alert("Imagen del evento editada con éxito");
             window.location.reload();

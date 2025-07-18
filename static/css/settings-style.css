@@ -1,0 +1,206 @@
+/* =========================
+   Settings Page Styles
+   ========================= */
+
+.settings-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: var(--white-color);
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.settings-container h1 {
+    color: var(--secondary-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.settings-container h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--primary-color);
+    border-radius: 2px;
+}
+
+.settings-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.settings-container label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.settings-container select,
+.settings-container input[type="number"] {
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background-color: #fafafa;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.settings-container select:focus,
+.settings-container input[type="number"]:focus {
+    border-color: var(--primary-color);
+    background-color: var(--white-color);
+    box-shadow: 0 0 0 3px rgba(193, 2, 48, 0.1);
+}
+
+.settings-container select:hover,
+.settings-container input[type="number"]:hover {
+    border-color: var(--primary-color);
+    background-color: var(--white-color);
+}
+
+.settings-container select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6,9 12,15 18,9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+    padding-right: 3rem;
+}
+
+.settings-container input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.settings-container input[type="number"]::-webkit-outer-spin-button,
+.settings-container input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.settings-container .a-button-filled-red {
+    margin-top: 1rem;
+    padding: 1.2rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: center;
+    min-width: 200px;
+}
+
+.settings-container .a-button-filled-red:hover {
+    background-color: #a01e3a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(193, 2, 48, 0.3);
+}
+
+.settings-container .a-button-filled-red:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 6px rgba(193, 2, 48, 0.3);
+}
+
+/* Form field descriptions */
+.field-description {
+    font-size: 0.9rem;
+    color: var(--tertiary-color);
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
+/* Success/Error messages */
+.message {
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .settings-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .settings-container h1 {
+        font-size: 2rem;
+    }
+    
+    .settings-container .a-button-filled-red {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-container {
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .settings-container h1 {
+        font-size: 1.8rem;
+    }
+}
+
+/* Loading state for button */
+.settings-container .a-button-filled-red.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.settings-container .a-button-filled-red.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid var(--white-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

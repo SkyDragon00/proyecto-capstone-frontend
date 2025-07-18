@@ -375,11 +375,6 @@ async def record_assistant_with_data(
     :return: HTML response with the rendered template.
     :rtype: _TemplateResponse
     """
-    if role != "organizer":
-        return RedirectResponse(
-            url="/login",
-            status_code=status.HTTP_303_SEE_OTHER
-        )
 
     file = {
         "image": (image.filename, await image.read(), image.content_type)
