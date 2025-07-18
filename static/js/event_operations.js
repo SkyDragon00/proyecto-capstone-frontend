@@ -4,7 +4,7 @@ function deleteEvent(eventId) {
         return;
     }
 
-    fetch(`https://proyecto-capstone-backend.onrender.com/events/${eventId}`, {
+    fetch(`http://127.0.0.1:8000/events/${eventId}`, {
         method: "DELETE",
         headers: {
             accept: "application/json",
@@ -32,15 +32,12 @@ function deleteDate(dateId) {
         return;
     }
 
-    fetch(
-        `https://proyecto-capstone-backend.onrender.com/events/date/${dateId}`,
-        {
-            method: "DELETE",
-            headers: {
-                accept: "application/json",
-            },
-        }
-    )
+    fetch(`http://127.0.0.1:8000/events/date/${dateId}`, {
+        method: "DELETE",
+        headers: {
+            accept: "application/json",
+        },
+    })
         .then((response) => {
             if (response.ok) {
                 alert("Fecha eliminada con éxito");

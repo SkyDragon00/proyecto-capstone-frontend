@@ -4,7 +4,7 @@ async function addCompanion(eventId) {
     ).value;
 
     // curl -X 'GET' \
-    //   'https://proyecto-capstone-backend.onrender.com/assistant/get-by-id-number/1750319731' \
+    //   'http://127.0.0.1:8000/assistant/get-by-id-number/1750319731' \
     //   -H 'accept: application/json'
     if (!companionIdentification) {
         alert("Por favor, ingresa la identificación del acompañante.");
@@ -14,7 +14,7 @@ async function addCompanion(eventId) {
     let acompañante;
 
     await fetch(
-        `https://proyecto-capstone-backend.onrender.com/assistant/get-by-id-number/${companionIdentification}`
+        `http://127.0.0.1:8000/assistant/get-by-id-number/${companionIdentification}`
     )
         .then((response) => {
             if (!response.ok) {
@@ -43,7 +43,7 @@ async function addCompanion(eventId) {
         ?.split("=")[1];
 
     fetch(
-        `https://proyecto-capstone-backend.onrender.com/assistant/register-companion-to-event/${eventId}`,
+        `http://127.0.0.1:8000/assistant/register-companion-to-event/${eventId}`,
         {
             method: "POST",
             headers: {

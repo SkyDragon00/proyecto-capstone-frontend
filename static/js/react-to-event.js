@@ -1,6 +1,6 @@
 function likeEvent(userId, eventId) {
     fetch(
-        `https://proyecto-capstone-backend.onrender.com/assistant/react/${userId}/${eventId}?reaction=like`,
+        `http://127.0.0.1:8000/assistant/react/${userId}/${eventId}?reaction=like`,
         {
             method: "GET",
         }
@@ -10,7 +10,7 @@ function likeEvent(userId, eventId) {
 
 function dislikeEvent(userId, eventId) {
     fetch(
-        `https://proyecto-capstone-backend.onrender.com/assistant/react/${userId}/${eventId}?reaction=dislike`,
+        `http://127.0.0.1:8000/assistant/react/${userId}/${eventId}?reaction=dislike`,
         {
             method: "GET",
         }

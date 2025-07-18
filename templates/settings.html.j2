@@ -2,31 +2,43 @@
 
 {% block title %}Settings{% endblock title %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/settings-style.css') }}">
+{% endblock head %}
+
 {% block main %}
 <div class="settings-container">
     <h1>Configuración de la Aplicación</h1>
+
     <form>
-        <label for="model">Modelo:</label>
-        <select id="model" name="model">
-            <option value="VGG-Face" {% if app_settings.model=='VGG-Face' %}selected{% endif %}>VGG-Face</option>
-            <option value="Facenet" {% if app_settings.model=='Facenet' %}selected{% endif %}>Facenet</option>
-            <option value="Facenet512" {% if app_settings.model=='Facenet512' %}selected{% endif %}>Facenet512</option>
-            <option value="OpenFace" {% if app_settings.model=='OpenFace' %}selected{% endif %}>OpenFace</option>
-            <option value="DeepFace" {% if app_settings.model=='DeepFace' %}selected{% endif %}>DeepFace</option>
-            <option value="DeepID" {% if app_settings.model=='DeepID' %}selected{% endif %}>DeepID</option>
-            <option value="ArcFace" {% if app_settings.model=='ArcFace' %}selected{% endif %}>ArcFace</option>
-            <option value="Dlib" {% if app_settings.model=='Dlib' %}selected{% endif %}>Dlib</option>
-            <option value="SFace" {% if app_settings.model=='SFace' %}selected{% endif %}>SFace</option>
-            <option value="GhostFaceNet" {% if app_settings.model=='GhostFaceNet' %}selected{% endif %}>GhostFaceNet
-            </option>
-            <option value="Buffalo_L" {% if app_settings.model=='Buffalo_L' %}selected{% endif %}>Buffalo_L</option>
-        </select>
+        <div class="form-group">
+            <label for="model">Modelo de Reconocimiento Facial:</label>
+            <select id="model" name="model">
+                <option value="VGG-Face" {% if app_settings.model=='VGG-Face' %}selected{% endif %}>VGG-Face</option>
+                <option value="Facenet" {% if app_settings.model=='Facenet' %}selected{% endif %}>Facenet</option>
+                <option value="Facenet512" {% if app_settings.model=='Facenet512' %}selected{% endif %}>Facenet512
+                </option>
+                <option value="OpenFace" {% if app_settings.model=='OpenFace' %}selected{% endif %}>OpenFace</option>
+                <option value="DeepFace" {% if app_settings.model=='DeepFace' %}selected{% endif %}>DeepFace</option>
+                <option value="DeepID" {% if app_settings.model=='DeepID' %}selected{% endif %}>DeepID</option>
+                <option value="ArcFace" {% if app_settings.model=='ArcFace' %}selected{% endif %}>ArcFace</option>
+                <option value="Dlib" {% if app_settings.model=='Dlib' %}selected{% endif %}>Dlib</option>
+                <option value="SFace" {% if app_settings.model=='SFace' %}selected{% endif %}>SFace</option>
+                <option value="GhostFaceNet" {% if app_settings.model=='GhostFaceNet' %}selected{% endif %}>GhostFaceNet
+                </option>
+                <option value="Buffalo_L" {% if app_settings.model=='Buffalo_L' %}selected{% endif %}>Buffalo_L</option>
+            </select>
+            <div class="field-description">Selecciona el modelo de IA para el reconocimiento facial</div>
+        </div>
 
-        <label for="threshold">Umbral de Confianza:</label>
-        <input type="number" id="threshold" name="threshold" value="{{ app_settings.threshold }}" step="0.01" max="1"
-            min="0">
+        <div class="form-group">
+            <label for="threshold">Umbral de Confianza:</label>
+            <input type="number" id="threshold" name="threshold" value="{{ app_settings.threshold }}" step="0.01"
+                max="1" min="0">
+            <div class="field-description">Valor entre 0 y 1. Mayor valor = mayor precisión pero menos detecciones</div>
+        </div>
 
-        <button class="a-button-filled-red" onclick="saveSettings()">Guardar Cambios</button>
+        <button type="button" class="a-button-filled-red" onclick="saveSettings()">Guardar Cambios</button>
     </form>
 </div>
 {% endblock main %}

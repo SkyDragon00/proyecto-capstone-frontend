@@ -7,7 +7,7 @@ function saveSettings() {
     }
 
     fetch(
-        `https://proyecto-capstone-backend.onrender.com/organizer/change-settings?model_name=${model}&threshold=${threshold}`,
+        `http://127.0.0.1:8000/organizer/change-settings?model_name=${model}&threshold=${threshold}`,
         {
             method: "PATCH",
             headers: {

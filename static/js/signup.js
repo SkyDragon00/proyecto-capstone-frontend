@@ -89,13 +89,6 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
         return;
     }
 
-    const namePattern = /^[A-Z][a-z]+$/;
-    if (!namePattern.test(firstName) || !namePattern.test(lastName)) {
-        event.preventDefault();
-        alert("El nombre y apellido deben comenzar con mayúscula.");
-        return;
-    }
-
     const dateOfBirth = document.getElementById("date_of_birth").value;
     if (dateOfBirth) {
         const today = new Date();
@@ -167,7 +160,7 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
     // Elimina el campo confirm_password antes de enviar
     formData.delete("confirm_password");
 
-    fetch("https://proyecto-capstone-backend.onrender.com/assistant/add", {
+    fetch("http://127.0.0.1:8000/assistant/add", {
         method: "POST",
         body: formData,
     })

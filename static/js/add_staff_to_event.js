@@ -7,17 +7,14 @@ function addStaffToEvent() {
         return;
     }
 
-    fetch(
-        `https://proyecto-capstone-backend.onrender.com/staff/add-staff-to-event`,
-        {
-            method: "POST",
-            headers: {
-                accept: "application/json",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: `staff_id=${staffId}&event_id=${eventId}`,
-        }
-    )
+    fetch(`http://127.0.0.1:8000/staff/add-staff-to-event`, {
+        method: "POST",
+        headers: {
+            accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `staff_id=${staffId}&event_id=${eventId}`,
+    })
         .then((response) => {
             return response.json();
         })
