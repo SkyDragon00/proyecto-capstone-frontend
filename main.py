@@ -2708,7 +2708,7 @@ async def registered_users_for_event(
         name="registered_users_for_event.html.j2",
         context={
             "request": request,
-            "registered_users": registered_users,
+            "registered_events": registered_users,
             "role": role,
             "api_url": settings.API_URL,
         }
@@ -2758,7 +2758,7 @@ async def all_event_attendances(
         name="all_event_attendances.html.j2",
         context={
             "request": request,
-            "event_attendances": event_attendances,
+            "registered_events": event_attendances,
             "role": role,
             "api_url": settings.API_URL,
         }
@@ -2811,7 +2811,7 @@ async def users_attended_event_date(
         name="users_attended_event_date.html.j2",
         context={
             "request": request,
-            "attendees": attendees,
+            "registered_events": attendees,
             "role": role,
             "api_url": settings.API_URL,
         }

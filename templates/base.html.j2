@@ -55,9 +55,9 @@
             </div>
         </div>
         <nav class="bottom-header">
+            {% block header_nav %}
+            {% if role == "organizer" %}
             <ul>
-                {% block header_nav %}
-                {% if role == "organizer" %}
                 <li>
                     <a href="/all-events-view">Administrar Eventos</a>
                 </li>
@@ -76,21 +76,35 @@
                 <li>
                     <a href="/settings">Configuraciones</a>
                 </li>
-                {% elif role == "assistant" %}
+            </ul>
+            <ul style="border-top: 1px solid #ffffff;">
+                <li>
+                    <a href="/events/registered/all">Histórico de Registro</a>
+                </li>
+                <li>
+                    <a href="/events/attendances-users/all">Histórico de Asistencias</a>
+                </li>
+            </ul>
+            {% elif role == "assistant" %}
+            <ul>
                 <li>
                     <a href="/events">Todos los eventos</a>
                 </li>
-                {% elif role == "staff" %}
+            </ul>
+            {% elif role == "staff" %}
+            <ul>
                 <li>
                     <a href="/select-event-to-record">Grabar Asistencia</a>
                 </li>
-                {% else %}
+            </ul>
+            {% else %}
+            <ul>
                 <li>
                     <a href="/events">Todos los eventos</a>
                 </li>
-                {% endif %}
-                {% endblock header_nav %}
             </ul>
+            {% endif %}
+            {% endblock header_nav %}
         </nav>
     </header>
 

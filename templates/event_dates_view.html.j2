@@ -28,6 +28,7 @@
             <td>{{ date.end_time }}</td>
             <td>
                 <button onclick="deleteDate({{ date.id }})">Eliminar</button>
+                <a href="/events/attendances-users/{{ date.id }}">Asistencia</a>
             </td>
         </tr>
         {% endfor %}
