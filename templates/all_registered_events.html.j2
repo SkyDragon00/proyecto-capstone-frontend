@@ -1,0 +1,50 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Todos los eventos{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/table-style.css') }}" />
+{% endblock head %}
+
+{% block main %}
+<section class="upcoming-events">
+    <div class="flex-center justify-between">
+        <h2>Histórico de Usuarios Registrados</h2>
+    </div>
+
+    {% if registered_events %}
+    <div class="staff-table-container">
+        <table class="staff-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Identificación</th>
+                    <th>Teléfono</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for person in registered_events %}
+                <tr id="event-row-{{ person.id }}">
+                    <td>{{ person.id }}</td>
+                    <td>{{ person.first_name }} {{ person.last_name }}</td>
+                    <td>{{ person.email }}</td>
+                    <td>{{ person.assistant.id_number }}</td>
+                    <td>{{ person.assistant.phone }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="no-staff">
+        <p>No hay gente registrada.</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock main %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/event_operations.js') }}"></script>
+{% endblock scripts %}

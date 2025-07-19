@@ -2573,3 +2573,203 @@ async def add_staff_to_event_page(
             "role": role,
         }
     )
+
+
+@app.get(
+    "/events/registered/all",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve all registered events"
+)
+async def all_registered_events(
+    request: Request,
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
+):
+    """Endpoint to retrieve all registered events.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/registered/all"
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    registered_events = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="all_registered_events.html.j2",
+        context={
+            "request": request,
+            "registered_events": registered_events,
+            "role": role,
+        }
+    )
+
+
+@app.get(
+    "/events/registered/{event_id}",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve registered users for a specific event"
+)
+async def registered_users_for_event(
+    event_id: Annotated[int, Path()],
+    request: Request,
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
+):
+    """Endpoint to retrieve registered users for a specific event.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    if role not in ["organizer", "staff"]:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/registered/{event_id}"
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    registered_users = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="registered_users_for_event.html.j2",
+        context={
+            "request": request,
+            "registered_users": registered_users,
+            "role": role,
+        }
+    )
+
+
+@app.get(
+    "/events/attendances-users/all",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve all event attendances"
+)
+async def all_event_attendances(
+    request: Request,
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
+):
+    """Endpoint to retrieve all event attendances.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    if role != "organizer":
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/attendances-users/all"
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    event_attendances = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="all_event_attendances.html.j2",
+        context={
+            "request": request,
+            "event_attendances": event_attendances,
+            "role": role,
+        }
+    )
+
+
+@app.get(
+    "/events/attendances-users/{event_date_id}",
+    response_class=HTMLResponse,
+    summary="Endpoint to retrieve users who attended a specific event date"
+)
+async def users_attended_event_date(
+    event_date_id: Annotated[int, Path()],
+    request: Request,
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
+):
+    """Endpoint to retrieve users who attended a specific event date.
+
+    \f
+
+    :param request: Request object containing request information.
+    :type request: Request
+    :param event_date_id: ID of the event date to retrieve attendees for.
+    :type event_date_id: int
+    :return: HTML response with the rendered template.
+    :rtype: _TemplateResponse
+    """
+    if role not in ["organizer", "staff"]:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.API_URL}/events/attendances-users/{event_date_id}"
+        )
+
+    if response.status_code != status.HTTP_200_OK:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    attendees = response.json()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="users_attended_event_date.html.j2",
+        context={
+            "request": request,
+            "attendees": attendees,
+            "role": role,
+        }
+    )
