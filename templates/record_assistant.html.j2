@@ -151,4 +151,11 @@
     };
 </script>
 <script src="{{ url_for('static', path='js/record_assistant.js') }}"></script>
+
+{% if alert_no_face %}
+<script>
+    alert("No se pudo detectar el rostro en la imagen o se detectaron múltiples rostros. Por favor, asegúrese de que la imagen contenga exactamente una persona.");
+    window.location.href = "/record-assistant/{{ event_id }}/{{ event_date_id }}";
+</script>
+{% endif %}
 {% endblock scripts %}

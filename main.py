@@ -1,3 +1,4 @@
+from email import message
 import tempfile
 import json
 from typing import Annotated
@@ -312,6 +313,7 @@ async def record_assistant(
             "event_date_id": event_date_id,
             "role": role,
             "api_url": settings.API_URL,
+            "alert_no_face": False,  # Inicializar como False
         }
     )
 
@@ -397,6 +399,10 @@ async def record_assistant_with_data(
         files=file  # type: ignore
     )
 
+    alert_no_face = False
+    if assistants.status_code == status.HTTP_400_BAD_REQUEST:
+        alert_no_face = True
+
     assistants = assistants.json()
 
     # Verifica que si el json no es una lista, mandar una lista vacía
@@ -414,6 +420,7 @@ async def record_assistant_with_data(
             "api_url": settings.API_URL,
             "default_message": "No se puede reconocer el rostro o no coincide con ningún asistente registrado.",
             "role": role,
+            "alert_no_face": alert_no_face,
         }
     )
 

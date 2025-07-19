@@ -18,20 +18,17 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
             })
             .then((data) => {
                 assistantId = data.id;
-                alert(
-                    `Asistente encontrado: ${data.first_name} ${data.last_name}.`
-                );
             })
             .catch((error) => {
                 console.error(error);
                 alert(
                     "Ocurrió un error al buscar el asistente. Revise si la identificación es correcta."
                 );
-                return;
+                throw new Error(
+                    "Error al buscar el asistente: " + error.message
+                );
             });
     }
-
-    alert(`Registrando asistencia para el asistente con ID: ${assistantId}`);
 
     await fetch(
         `${API_URL}/events/add/attendance/${eventDateId}/${eventId}/${assistantId}`,
@@ -43,9 +40,16 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
         }
     )
         .then((response) => response.json())
-        .then((data) => alert("Asistencia registrada correctamente."))
+        .then((data) => {
+            if (data.detail == "Registration not found") {
+                alert("La persona no se encuentra registrada en el evento.");
+            } else if (data.detail.includes("Duplicate entry")) {
+                alert("La persona ya se encuentra registrada en el evento.");
+            } else {
+                alert("Asistencia registrada correctamente.");
+            }
+        })
         .catch((error) => alert("Error: " + error));
 
-    // Ahora recarga la página
     location.reload();
 }
