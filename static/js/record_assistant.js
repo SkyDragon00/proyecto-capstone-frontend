@@ -43,13 +43,20 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
         .then((data) => {
             if (data.detail == "Registration not found") {
                 alert("La persona no se encuentra registrada en el evento.");
-            } else if (data.detail.includes("Duplicate entry")) {
+            } else if (
+                typeof data.detail === "string" &&
+                data.detail.includes("Duplicate entry")
+            ) {
                 alert("La persona ya se encuentra registrada en el evento.");
             } else {
                 alert("Asistencia registrada correctamente.");
             }
         })
-        .catch((error) => alert("Error: " + error));
+        .catch((error) => {
+            console.log(error);
+
+            alert("Error: " + error);
+        });
 
     location.reload();
 }
