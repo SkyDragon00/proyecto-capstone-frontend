@@ -53,6 +53,7 @@
         const endTime = document.getElementById('end_time').value;
 
         const today = new Date();
+        today.setDate(today.getDate() - 1);
         const selectedDate = new Date(dayDate);
 
         // Validaciones del lado del cliente

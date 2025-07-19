@@ -14,17 +14,20 @@
     {% if events %}
     <ul class="list-upcoming-events">
         {% for event in events %}
+        {% set today_dates = event.event_dates | selectattr('day_date', 'equalto', today) | list %}
+        {% if today_dates %}
         <li class="event-card">
             <h2 class="event-title">{{ event.name }}</h2>
 
             <div class="event-dates-container">
-                {% for date in event.event_dates %}
+                {% for date in today_dates %}
                 <a href="/record-assistant/{{ event.id }}/{{ date.id }}" class="event-date-link">
                     📅 {{ date.day_date }}
                 </a>
                 {% endfor %}
             </div>
         </li>
+        {% endif %}
         {% endfor %}
     </ul>
     {% else %}

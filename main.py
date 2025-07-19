@@ -499,6 +499,10 @@ async def select_event_to_record(
     if not isinstance(events, list):
         events = []
 
+    # Get today's date for filtering events
+    from datetime import date
+    today = date.today().strftime('%Y-%m-%d')
+
     return templates.TemplateResponse(
         request=request,
         name="select_event_to_record.html.j2",
@@ -507,6 +511,7 @@ async def select_event_to_record(
             "events": events,
             "role": role,
             "api_url": settings.API_URL,
+            "today": today,
         }
     )
 
