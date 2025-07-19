@@ -7,7 +7,7 @@ function saveSettings() {
     }
 
     fetch(
-        `http://127.0.0.1:8000/organizer/change-settings?model_name=${model}&threshold=${threshold}`,
+        `${API_URL}/organizer/change-settings?model_name=${model}&threshold=${threshold}`,
         {
             method: "PATCH",
             headers: {

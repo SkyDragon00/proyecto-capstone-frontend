@@ -14,7 +14,7 @@ async function addCompanion(eventId) {
     let acompañante;
 
     await fetch(
-        `http://127.0.0.1:8000/assistant/get-by-id-number/${companionIdentification}`
+        `${API_URL}/assistant/get-by-id-number/${companionIdentification}`
     )
         .then((response) => {
             if (!response.ok) {
@@ -42,17 +42,14 @@ async function addCompanion(eventId) {
         .find((row) => row.startsWith("access_token="))
         ?.split("=")[1];
 
-    fetch(
-        `http://127.0.0.1:8000/assistant/register-companion-to-event/${eventId}`,
-        {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: `companion_id=${acompañante.id}&companion_type=first_grade`,
-        }
-    )
+    fetch(`${API_URL}/assistant/register-companion-to-event/${eventId}`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `companion_id=${acompañante.id}&companion_type=first_grade`,
+    })
         .then((response) => {
             if (!response.ok) {
                 throw new Error("Error en la solicitud");

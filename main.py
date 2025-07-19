@@ -60,7 +60,8 @@ async def home(
         context={
             "request": request,
             "events": events,
-            "role": role
+            "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -72,6 +73,7 @@ async def home(
 )
 async def terms(
     request: Request,
+    settings: SettingsDependency,
 ):
     """Endpoint to retrieve the terms and conditions page.
 
@@ -86,6 +88,10 @@ async def terms(
     return templates.TemplateResponse(
         request=request,
         name="terms.html.j2",
+        context={
+            "request": request,
+            "api_url": settings.API_URL,
+        }
     )
 
 
@@ -154,7 +160,8 @@ async def get_event_image(
 )
 def login(
     request: Request,
-    role: Annotated[str | None, Cookie()] = None
+    settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the login page.
 
@@ -172,6 +179,7 @@ def login(
         context={
             "request": request,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -243,6 +251,7 @@ def handle_login(
 )
 def signup(
     request: Request,
+    settings: SettingsDependency,
     role: Annotated[str | None, Cookie()] = None,
 ):
     """Endpoint to retrieve the signup page.
@@ -261,6 +270,7 @@ def signup(
         context={
             "request": request,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -272,6 +282,7 @@ def signup(
 )
 async def record_assistant(
     request: Request,
+    settings: SettingsDependency,
     event_id: Annotated[int, Path()],
     event_date_id: Annotated[int, Path()],
     role: Annotated[str | None, Cookie()] = None,
@@ -300,6 +311,7 @@ async def record_assistant(
             "event_id": event_id,
             "event_date_id": event_date_id,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -441,6 +453,7 @@ async def events(
             "request": request,
             "events": events,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -492,7 +505,8 @@ async def select_event_to_record(
         context={
             "request": request,
             "events": events,
-            "role": role
+            "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -595,7 +609,8 @@ async def event_detail(
             "event": event,
             "registered_events_ids": registered_events_ids,
             "role": role,
-            "user_info": user_info
+            "user_info": user_info,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -668,6 +683,7 @@ async def edit_event(
             "request": request,
             "event": event,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -824,7 +840,8 @@ async def add_companion(
         context={
             "request": request,
             "event_id": event_id,
-            "event": event
+            "event": event,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -1320,6 +1337,7 @@ async def create_staff(
         context={
             "request": request,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -1505,6 +1523,7 @@ async def edit_staff_form(
             "request": request,
             "staff_member": staff_member,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -1759,6 +1778,7 @@ async def create_organizer(
         context={
             "request": request,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2001,6 +2021,7 @@ async def edit_organizer_form(
             "organizer": organizer,
             "organizer_id": organizer_id,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2187,6 +2208,7 @@ async def create_event_page(
         context={
             "request": request,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2308,6 +2330,7 @@ async def all_events_view(
             "request": request,
             "events": events,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2341,7 +2364,8 @@ async def staff(
         name="staff.html.j2",
         context={
             "request": request,
-            "organizers": organizers
+            "organizers": organizers,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2387,6 +2411,7 @@ async def event_dates_view(
             "event_dates": event_dates,
             "event_id": event_id,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2428,6 +2453,7 @@ async def create_event_date_page(
             "request": request,
             "event_id": event_id,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2571,6 +2597,7 @@ async def add_staff_to_event_page(
             "staff_list": staff,
             "events_list": events,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2620,6 +2647,7 @@ async def all_registered_events(
             "request": request,
             "registered_events": registered_events,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2670,6 +2698,7 @@ async def registered_users_for_event(
             "request": request,
             "registered_users": registered_users,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2719,6 +2748,7 @@ async def all_event_attendances(
             "request": request,
             "event_attendances": event_attendances,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )
 
@@ -2771,5 +2801,6 @@ async def users_attended_event_date(
             "request": request,
             "attendees": attendees,
             "role": role,
+            "api_url": settings.API_URL,
         }
     )

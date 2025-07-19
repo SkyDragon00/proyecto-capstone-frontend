@@ -27,6 +27,11 @@
     <link rel="manifest" href="{{ url_for('static', path='imgs/favicon/site.webmanifest') }}" />
 
     {% block head %}{% endblock head %}
+
+    <script>
+        // Global API URL variable - available throughout the application
+        window.API_URL = "{{ api_url if api_url else '' }}";
+    </script>
 </head>
 
 <body>

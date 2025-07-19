@@ -7,7 +7,7 @@ function addStaffToEvent() {
         return;
     }
 
-    fetch(`http://127.0.0.1:8000/staff/add-staff-to-event`, {
+    fetch(`${API_URL}/staff/add-staff-to-event`, {
         method: "POST",
         headers: {
             accept: "application/json",

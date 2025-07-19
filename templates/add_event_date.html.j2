@@ -47,7 +47,7 @@
 
 {% block scripts %}
 <script>
-    document.getElementById('event-form').addEventListener('submit', function (event) {
+    document.getElementById('event-form').addEventListener('submit', async function (event) {
         const dayDate = document.getElementById('day_date').value;
         const startTime = document.getElementById('start_time').value;
         const endTime = document.getElementById('end_time').value;
@@ -55,6 +55,7 @@
         const today = new Date();
         const selectedDate = new Date(dayDate);
 
+        // Validaciones del lado del cliente
         if (selectedDate < today) {
             event.preventDefault();
             alert('La fecha del evento debe ser futura.');
@@ -65,6 +66,39 @@
             event.preventDefault();
             alert('La hora de fin debe ser mayor a la hora de inicio.');
             return;
+        }
+
+        // Prevenir el envío normal del formulario
+        event.preventDefault();
+
+        // Obtener datos del formulario
+        const formData = new FormData(event.target);
+
+        try {
+            // Enviar formulario usando fetch
+            const response = await fetch(event.target.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                // Si es exitoso, redireccionar
+                window.location.href = response.url || `/{{ event_id }}/event-dates`;
+            } else {
+                // Manejar errores del servidor
+                const errorText = await response.text();
+
+                // Verificar si es un error de fecha duplicada
+                if (response.status === 422 || errorText.includes('duplicate') || errorText.includes('duplicada')) {
+                    alert('Esta fecha ya existe para el evento. Por favor, selecciona una fecha diferente.');
+                } else {
+                    // Para otros errores
+                    alert('Error al crear la fecha del evento. Por favor, inténtalo de nuevo.');
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error de conexión. Por favor, verifica tu conexión a internet e inténtalo de nuevo.');
         }
     });
 </script>

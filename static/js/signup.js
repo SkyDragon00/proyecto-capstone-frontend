@@ -160,7 +160,7 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
     // Elimina el campo confirm_password antes de enviar
     formData.delete("confirm_password");
 
-    fetch("http://127.0.0.1:8000/assistant/add", {
+    fetch(`${API_URL}/assistant/add`, {
         method: "POST",
         body: formData,
     })

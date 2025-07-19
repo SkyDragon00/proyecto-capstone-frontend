@@ -4,7 +4,7 @@ function deleteEvent(eventId) {
         return;
     }
 
-    fetch(`http://127.0.0.1:8000/events/${eventId}`, {
+    fetch(`${API_URL}/events/${eventId}`, {
         method: "DELETE",
         headers: {
             accept: "application/json",
@@ -32,7 +32,7 @@ function deleteDate(dateId) {
         return;
     }
 
-    fetch(`http://127.0.0.1:8000/events/date/${dateId}`, {
+    fetch(`${API_URL}/events/date/${dateId}`, {
         method: "DELETE",
         headers: {
             accept: "application/json",
