@@ -11,33 +11,40 @@ class StaffOperations {
     initializeEventListeners() {
         // Initialize form validations
         this.setupFormValidation();
-        
+
         // Initialize delete confirmations
         this.setupDeleteConfirmations();
     }
 
     setupFormValidation() {
         // Create Staff Form Validation
-        const createForm = document.getElementById('login-form');
-        if (createForm && createForm.action.includes('/create-staff')) {
-            createForm.addEventListener('submit', this.validateCreateStaffForm.bind(this));
+        const createForm = document.getElementById("login-form");
+        if (createForm && createForm.action.includes("/create-staff")) {
+            createForm.addEventListener(
+                "submit",
+                this.validateCreateStaffForm.bind(this)
+            );
         }
 
         // Edit Staff Form Validation
-        const editForm = document.getElementById('edit-staff-form');
+        const editForm = document.getElementById("edit-staff-form");
         if (editForm) {
-            editForm.addEventListener('submit', this.validateEditStaffForm.bind(this));
+            editForm.addEventListener(
+                "submit",
+                this.validateEditStaffForm.bind(this)
+            );
         }
     }
 
     setupDeleteConfirmations() {
         // Add event listeners for delete buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.btn-delete')) {
+        document.addEventListener("click", (e) => {
+            if (e.target.closest(".btn-delete")) {
                 e.preventDefault();
-                const button = e.target.closest('.btn-delete');
-                const staffId = button.getAttribute('data-staff-id') || 
-                              button.getAttribute('onclick')?.match(/\d+/)?.[0];
+                const button = e.target.closest(".btn-delete");
+                const staffId =
+                    button.getAttribute("data-staff-id") ||
+                    button.getAttribute("onclick")?.match(/\d+/)?.[0];
                 if (staffId) {
                     this.confirmDelete(staffId);
                 }
@@ -47,37 +54,43 @@ class StaffOperations {
 
     validateCreateStaffForm(e) {
         const formData = new FormData(e.target);
-        const firstName = formData.get('first_name')?.trim();
-        const lastName = formData.get('last_name')?.trim();
-        const email = formData.get('email')?.trim();
-        const password = formData.get('password');
-        const confirmPassword = formData.get('confirm_password');
+        const firstName = formData.get("first_name")?.trim();
+        const lastName = formData.get("last_name")?.trim();
+        const email = formData.get("email")?.trim();
+        const password = formData.get("password");
+        const confirmPassword = formData.get("confirm_password");
 
         // Validate required fields
-        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        if (
+            !firstName ||
+            !lastName ||
+            !email ||
+            !password ||
+            !confirmPassword
+        ) {
             e.preventDefault();
-            this.showError('Todos los campos son obligatorios.');
+            this.showError("Todos los campos son obligatorios.");
             return false;
         }
 
         // Validate email format
         if (!this.isValidEmail(email)) {
             e.preventDefault();
-            this.showError('Por favor, introduce un email válido.');
+            this.showError("Por favor, introduce un email válido.");
             return false;
         }
 
         // Validate password match
         if (password !== confirmPassword) {
             e.preventDefault();
-            this.showError('Las contraseñas no coinciden.');
+            this.showError("Las contraseñas no coinciden.");
             return false;
         }
 
         // Validate password strength
         if (!this.isValidPassword(password)) {
             e.preventDefault();
-            this.showError('La contraseña debe tener al menos 8 caracteres.');
+            this.showError("La contraseña debe tener al menos 8 caracteres.");
             return false;
         }
 
@@ -86,29 +99,31 @@ class StaffOperations {
 
     validateEditStaffForm(e) {
         const formData = new FormData(e.target);
-        const firstName = formData.get('first_name')?.trim();
-        const lastName = formData.get('last_name')?.trim();
-        const email = formData.get('email')?.trim();
-        const password = formData.get('password');
+        const firstName = formData.get("first_name")?.trim();
+        const lastName = formData.get("last_name")?.trim();
+        const email = formData.get("email")?.trim();
+        const password = formData.get("password");
 
         // Check if at least one field is modified
         if (!firstName && !lastName && !email && !password) {
             e.preventDefault();
-            this.showError('Debes modificar al menos un campo para actualizar.');
+            this.showError(
+                "Debes modificar al menos un campo para actualizar."
+            );
             return false;
         }
 
         // Validate email format if provided
         if (email && !this.isValidEmail(email)) {
             e.preventDefault();
-            this.showError('Por favor, introduce un email válido.');
+            this.showError("Por favor, introduce un email válido.");
             return false;
         }
 
         // Validate password if provided
         if (password && !this.isValidPassword(password)) {
             e.preventDefault();
-            this.showError('La contraseña debe tener al menos 8 caracteres.');
+            this.showError("La contraseña debe tener al menos 8 caracteres.");
             return false;
         }
 
@@ -116,14 +131,20 @@ class StaffOperations {
     }
 
     async confirmDelete(staffId) {
-        const result = await this.showConfirmDialog(
-            '¿Estás seguro?',
-            '¿Estás seguro de que quieres eliminar este miembro del staff? Esta acción no se puede deshacer.',
-            'Eliminar',
-            'Cancelar'
-        );
+        // Requires SweetAlert2 (Swal) to be loaded globally
+        const result = await Swal.fire({
+            title: "¿Estás seguro?",
+            text: "¿Estás seguro de que quieres eliminar este miembro del staff? Esta acción no se puede deshacer.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Eliminar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d",
+            reverseButtons: true,
+        });
 
-        if (result) {
+        if (result.isConfirmed) {
             await this.deleteStaff(staffId);
         }
     }
@@ -131,35 +152,36 @@ class StaffOperations {
     async deleteStaff(staffId) {
         try {
             this.showLoading(true);
-            
+
             const response = await fetch(`/staff/delete/${staffId}`, {
-                method: 'DELETE',
+                method: "DELETE",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
             });
 
             if (response.ok) {
                 const result = await response.json();
-                this.showSuccess(result.message || 'Staff eliminado correctamente');
-                
+                this.showSuccess(
+                    result.message || "Staff eliminado correctamente"
+                );
+
                 // Redirect after a short delay
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
-                
             } else {
                 const error = await response.json();
                 if (error.redirect) {
                     window.location.href = error.redirect;
                 } else {
-                    this.showError(error.error || 'Error al eliminar el staff');
+                    this.showError(error.error || "Error al eliminar el staff");
                 }
             }
         } catch (error) {
-            console.error('Error:', error);
-            this.showError('Error de conexión. Por favor, inténtalo de nuevo.');
+            console.error("Error:", error);
+            this.showError("Error de conexión. Por favor, inténtalo de nuevo.");
         } finally {
             this.showLoading(false);
         }
@@ -176,16 +198,16 @@ class StaffOperations {
     }
 
     showError(message) {
-        this.showNotification(message, 'error');
+        this.showNotification(message, "error");
     }
 
     showSuccess(message) {
-        this.showNotification(message, 'success');
+        this.showNotification(message, "success");
     }
 
-    showNotification(message, type = 'info') {
+    showNotification(message, type = "info") {
         // Create notification element
-        const notification = document.createElement('div');
+        const notification = document.createElement("div");
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
             <div class="notification-content">
@@ -209,10 +231,10 @@ class StaffOperations {
     }
 
     addNotificationStyles() {
-        if (document.getElementById('notification-styles')) return;
+        if (document.getElementById("notification-styles")) return;
 
-        const styles = document.createElement('style');
-        styles.id = 'notification-styles';
+        const styles = document.createElement("style");
+        styles.id = "notification-styles";
         styles.textContent = `
             .notification {
                 position: fixed;
@@ -311,12 +333,12 @@ class StaffOperations {
     }
 
     showLoading(show = true) {
-        const existingOverlay = document.getElementById('loading-overlay');
-        
+        const existingOverlay = document.getElementById("loading-overlay");
+
         if (show && !existingOverlay) {
-            const overlay = document.createElement('div');
-            overlay.id = 'loading-overlay';
-            overlay.className = 'loading-overlay';
+            const overlay = document.createElement("div");
+            overlay.id = "loading-overlay";
+            overlay.className = "loading-overlay";
             overlay.innerHTML = '<div class="loading-spinner"></div>';
             document.body.appendChild(overlay);
         } else if (!show && existingOverlay) {
@@ -324,10 +346,15 @@ class StaffOperations {
         }
     }
 
-    async showConfirmDialog(title, message, confirmText = 'Confirmar', cancelText = 'Cancelar') {
+    async showConfirmDialog(
+        title,
+        message,
+        confirmText = "Confirmar",
+        cancelText = "Cancelar"
+    ) {
         return new Promise((resolve) => {
-            const dialog = document.createElement('div');
-            dialog.className = 'confirm-dialog-overlay';
+            const dialog = document.createElement("div");
+            dialog.className = "confirm-dialog-overlay";
             dialog.innerHTML = `
                 <div class="confirm-dialog">
                     <div class="confirm-dialog-header">
@@ -347,21 +374,21 @@ class StaffOperations {
             this.addConfirmDialogStyles();
 
             // Add event listeners
-            const cancelBtn = dialog.querySelector('.btn-cancel');
-            const confirmBtn = dialog.querySelector('.btn-confirm');
-            
-            cancelBtn.addEventListener('click', () => {
+            const cancelBtn = dialog.querySelector(".btn-cancel");
+            const confirmBtn = dialog.querySelector(".btn-confirm");
+
+            cancelBtn.addEventListener("click", () => {
                 dialog.remove();
                 resolve(false);
             });
-            
-            confirmBtn.addEventListener('click', () => {
+
+            confirmBtn.addEventListener("click", () => {
                 dialog.remove();
                 resolve(true);
             });
 
             // Close on overlay click
-            dialog.addEventListener('click', (e) => {
+            dialog.addEventListener("click", (e) => {
                 if (e.target === dialog) {
                     dialog.remove();
                     resolve(false);
@@ -373,10 +400,10 @@ class StaffOperations {
     }
 
     addConfirmDialogStyles() {
-        if (document.getElementById('confirm-dialog-styles')) return;
+        if (document.getElementById("confirm-dialog-styles")) return;
 
-        const styles = document.createElement('style');
-        styles.id = 'confirm-dialog-styles';
+        const styles = document.createElement("style");
+        styles.id = "confirm-dialog-styles";
         styles.textContent = `
             .confirm-dialog-overlay {
                 position: fixed;
@@ -458,12 +485,12 @@ class StaffOperations {
 }
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
     new StaffOperations();
 });
 
 // Global function for backward compatibility
-window.deleteStaff = async function(staffId) {
+window.deleteStaff = async function (staffId) {
     const staffOps = new StaffOperations();
     await staffOps.confirmDelete(staffId);
 };
