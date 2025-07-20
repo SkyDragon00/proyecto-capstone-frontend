@@ -9,7 +9,7 @@
 {% block main %}
 <section class="upcoming-events">
     <div class="flex-center justify-between">
-        <h2>Usuarios que Asistieron este Día al Evento</h2>
+        <h2>Usuarios que Asistieron a {{ event_info.name }} el {{ date_info.day_date }}</h2>
     </div>
 
     {% if registered_events %}

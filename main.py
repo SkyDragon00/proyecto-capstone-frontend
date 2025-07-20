@@ -2798,6 +2798,15 @@ async def users_attended_event_date(
             f"{settings.API_URL}/events/attendances-users/{event_date_id}"
         )
 
+        # /info-event-by-date/{event_date_id}
+        event = await client.get(
+            f"{settings.API_URL}/events/info-event-by-date/{event_date_id}"
+        )
+        # /info-event-by-date/{event_date_id}
+        date = await client.get(
+            f"{settings.API_URL}/events/info-event-date/{event_date_id}"
+        )
+
     if response.status_code != status.HTTP_200_OK:
         raise HTTPException(
             status_code=response.status_code,
@@ -2805,6 +2814,8 @@ async def users_attended_event_date(
         )
 
     attendees = response.json()
+    event_info = event.json()
+    date_info = date.json()
 
     return templates.TemplateResponse(
         request=request,
@@ -2814,5 +2825,7 @@ async def users_attended_event_date(
             "registered_events": attendees,
             "role": role,
             "api_url": settings.API_URL,
+            "event_info": event_info,
+            "date_info": date_info,
         }
     )
