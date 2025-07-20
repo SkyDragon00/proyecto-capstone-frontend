@@ -22,16 +22,18 @@
                     <th>Email</th>
                     <th>Identificación</th>
                     <th>Teléfono</th>
+                    <th>Hora de asistencia</th>
                 </tr>
             </thead>
             <tbody>
                 {% for person in registered_events %}
-                <tr id="event-row-{{ person.id }}">
-                    <td>{{ person.id }}</td>
-                    <td>{{ person.first_name }} {{ person.last_name }}</td>
-                    <td>{{ person.email }}</td>
-                    <td>{{ person.assistant.id_number }}</td>
-                    <td>{{ person.assistant.phone }}</td>
+                <tr id="event-row-{{ person.user.id }}">
+                    <td>{{ person.user.id }}</td>
+                    <td>{{ person.user.first_name }} {{ person.user.last_name }}</td>
+                    <td>{{ person.user.email }}</td>
+                    <td>{{ person.user.assistant.id_number }}</td>
+                    <td>{{ person.user.assistant.phone }}</td>
+                    <td>{{ person.attendance.arrival_time }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
