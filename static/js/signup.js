@@ -67,14 +67,24 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
         !confirmPassword
     ) {
         event.preventDefault();
-        alert("Por favor, complete todos los campos.");
+        Swal.fire({
+            title: "Campos incompletos",
+            text: "Por favor, complete todos los campos.",
+            icon: "warning",
+            confirmButtonText: "Entendido",
+        });
         return;
     }
 
     // Confirmar que las dos contraseñas coinciden
     if (password !== confirmPassword) {
         event.preventDefault();
-        alert("Las contraseñas no coinciden.");
+        Swal.fire({
+            title: "Error en las contraseñas",
+            text: "Las contraseñas no coinciden.",
+            icon: "error",
+            confirmButtonText: "Entendido",
+        });
         return;
     }
 
@@ -83,9 +93,12 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8}/;
     if (!passwordPattern.test(password)) {
         event.preventDefault();
-        alert(
-            "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."
-        );
+        Swal.fire({
+            title: "Contraseña inválida",
+            text: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.",
+            icon: "error",
+            confirmButtonText: "Entendido",
+        });
         return;
     }
 
@@ -95,9 +108,12 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
         const birthDate = new Date(dateOfBirth);
         if (birthDate >= today) {
             event.preventDefault();
-            alert(
-                "La fecha de nacimiento debe ser anterior a la fecha actual."
-            );
+            Swal.fire({
+                title: "Fecha inválida",
+                text: "La fecha de nacimiento debe ser anterior a la fecha actual.",
+                icon: "warning",
+                confirmButtonText: "Entendido",
+            });
             return;
         }
     }
@@ -106,30 +122,48 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
     const idType = document.getElementById("id_number_type").value;
     if (idType === "cedula" && !validarCedulaEcuatoriana(idNumber)) {
         event.preventDefault();
-        alert("El número de cédula ingresado no es válido.");
+        Swal.fire({
+            title: "Cédula inválida",
+            text: "El número de cédula ingresado no es válido.",
+            icon: "error",
+            confirmButtonText: "Entendido",
+        });
         return;
     }
 
     // Si es pasaporte verificar que tenga 9 caracteres y el primero sea la letra A (passport)
     if (idType === "passport" && !/^[A][0-9]{7}$/.test(idNumber)) {
         event.preventDefault();
-        alert("El número de pasaporte ingresado no es válido.");
+        Swal.fire({
+            title: "Pasaporte inválido",
+            text: "El número de pasaporte ingresado no es válido.",
+            icon: "error",
+            confirmButtonText: "Entendido",
+        });
         return;
     }
 
     // Validar el teléfono sin codigo de país
     if (!/^\d{10}$/.test(phone)) {
         event.preventDefault();
-        alert("El número de teléfono debe tener 10 dígitos.");
+        Swal.fire({
+            title: "Teléfono inválido",
+            text: "El número de teléfono debe tener 10 dígitos.",
+            icon: "error",
+            confirmButtonText: "Entendido",
+        });
         return;
     }
 
     // Haz esta validación                 if self.email.endswith("udla.edu.ec") or not (self.email.endswith("@gmail.com") or self.email.endswith("@hotmail.com") or self.email.endswith("@outlook.com") or self.email.endswith("@protonmail.com") or self.email.endswith("@yahoo.com")):
     if (email.endsWith("@udla.edu.ec")) {
         event.preventDefault();
-        alert(
-            "El correo electrónico no puede ser de la universidad. Por favor, utiliza un correo personal."
-        );
+        Swal.fire({
+            title: "Email no permitido",
+            text: "El correo electrónico no puede ser de la universidad. Por favor, utiliza un correo personal.",
+            icon: "warning",
+            confirmButtonText: "Entendido",
+        });
         return;
     }
 
@@ -144,9 +178,12 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
         )
     ) {
         event.preventDefault();
-        alert(
-            "El correo electrónico debe ser de un proveedor común (Gmail, Hotmail, Outlook, ProtonMail, Yahoo)."
-        );
+        Swal.fire({
+            title: "Proveedor de email no permitido",
+            text: "El correo electrónico debe ser de un proveedor común (Gmail, Hotmail, Outlook, ProtonMail, Yahoo).",
+            icon: "warning",
+            confirmButtonText: "Entendido",
+        });
         return;
     }
 
@@ -174,16 +211,47 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
                             "Face could not be detected"
                         )
                     ) {
-                        alert(
-                            "No se pudo detectar un único rostro en la imagen. Por favor, asegúrate de que la imagen contenga un solo rostro claro y visible."
-                        );
+                        Swal.fire({
+                            title: "Error en la imagen",
+                            text: "No se pudo detectar un único rostro en la imagen. Por favor, asegúrate de que la imagen contenga un solo rostro claro y visible.",
+                            icon: "error",
+                            confirmButtonText: "Entendido",
+                        });
+                    } else if (
+                        errorText["detail"].includes("person already exists")
+                    ) {
+                        Swal.fire({
+                            title: "Usuario ya registrado",
+                            text: "Usted ya se encuentra registrado. Por favor, inicie sesión.",
+                            icon: "warning",
+                            confirmButtonText: "Entendido",
+                        });
+                    } else if (
+                        errorText["detail"].includes("User already exists")
+                    ) {
+                        Swal.fire({
+                            title: "Usuario ya registrado",
+                            text: "Usted ya se encuentra registrado. Por favor, inicie sesión.",
+                            icon: "warning",
+                            confirmButtonText: "Entendido",
+                        });
                     } else {
-                        alert("Error en el registro: " + errorText.detail);
+                        Swal.fire({
+                            title: "Error en el registro",
+                            text: "Error en el registro: " + errorText.detail,
+                            icon: "error",
+                            confirmButtonText: "Intentar de nuevo",
+                        });
                     }
                 });
             }
         })
         .catch((err) => {
-            alert("Error de red: " + err.message);
+            Swal.fire({
+                title: "Error de red",
+                text: "Error de red: " + err.message,
+                icon: "error",
+                confirmButtonText: "Reintentar",
+            });
         });
 });

@@ -65,20 +65,35 @@
 
         if (password !== confirmPassword) {
             event.preventDefault();
-            alert('Las contraseñas no coinciden. Por favor, inténtalo de nuevo.');
+            Swal.fire({
+                title: 'Error en las contraseñas',
+                text: 'Las contraseñas no coinciden. Por favor, inténtalo de nuevo.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
         }
 
         const email = document.getElementById('email').value;
         if (!email.endsWith('@udla.edu.ec')) {
             event.preventDefault();
-            alert('El correo electrónico debe terminar con @udla.edu.ec.');
+            Swal.fire({
+                title: 'Email inválido',
+                text: 'El correo electrónico debe terminar con @udla.edu.ec.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
         }
 
         const passwordPattern =
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8}/;
         if (!passwordPattern.test(password)) {
             event.preventDefault();
-            alert('La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.');
+            Swal.fire({
+                title: 'Contraseña inválida',
+                text: 'La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
         }
     });
 </script>

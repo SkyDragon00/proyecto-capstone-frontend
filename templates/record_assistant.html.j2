@@ -106,7 +106,12 @@
                 localStorage.setItem('preferredCamera', deviceId);
             }
         } catch (err) {
-            alert('No se pudo acceder a la cámara: ' + err.message);
+            Swal.fire({
+                title: 'Error de cámara',
+                text: 'No se pudo acceder a la cámara: ' + err.message,
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
         }
     }
 
@@ -125,13 +130,23 @@
         if (videoDevices.length > 0) {
             await startCamera(videoDevices[currentDeviceIndex].deviceId);
         } else {
-            alert('No se detectaron cámaras.');
+            Swal.fire({
+                title: 'Sin cámaras',
+                text: 'No se detectaron cámaras.',
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+            });
         }
     };
 
     document.getElementById('switch-camera').onclick = async function () {
         if (videoDevices.length <= 1) {
-            alert('No hay más de una cámara conectada.');
+            Swal.fire({
+                title: 'Una sola cámara',
+                text: 'No hay más de una cámara conectada.',
+                icon: 'info',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
         currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
@@ -156,8 +171,14 @@
 
 {% if alert_no_face %}
 <script>
-    alert("No se pudo detectar el rostro en la imagen o se detectaron múltiples rostros. Por favor, asegúrese de que la imagen contenga exactamente una persona.");
-    window.location.href = "/record-assistant/{{ event_id }}/{{ event_date_id }}";
+    Swal.fire({
+        title: 'Error en la detección',
+        text: 'No se pudo detectar el rostro en la imagen o se detectaron múltiples rostros. Por favor, asegúrese de que la imagen contenga exactamente una persona.',
+        icon: 'error',
+        confirmButtonText: 'Intentar de nuevo'
+    }).then(() => {
+        window.location.href = "/record-assistant/{{ event_id }}/{{ event_date_id }}";
+    });
 </script>
 {% endif %}
 {% endblock scripts %}

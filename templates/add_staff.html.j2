@@ -67,13 +67,23 @@
 
         if (!firstName || !lastName || !email || !password || !confirmPassword) {
             event.preventDefault();
-            alert('Por favor, complete todos los campos.');
+            Swal.fire({
+                title: 'Campos incompletos',
+                text: 'Por favor, complete todos los campos.',
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
 
         if (password !== confirmPassword) {
             event.preventDefault();
-            alert('Las contraseñas no coinciden.');
+            Swal.fire({
+                title: 'Error en las contraseñas',
+                text: 'Las contraseñas no coinciden.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
 
@@ -81,13 +91,23 @@
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8}/;
         if (!passwordPattern.test(password)) {
             event.preventDefault();
-            alert('La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.');
+            Swal.fire({
+                title: 'Contraseña inválida',
+                text: 'La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
 
         if (!isValidEmail(email)) {
             event.preventDefault();
-            alert('Por favor, introduce un email válido y este debe ser de la UDLA (udla.edu.ec).');
+            Swal.fire({
+                title: 'Email inválido',
+                text: 'Por favor, introduce un email válido y este debe ser de la UDLA (udla.edu.ec).',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
     });

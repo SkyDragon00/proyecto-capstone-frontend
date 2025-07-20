@@ -1,6 +1,17 @@
-function deleteEvent(eventId) {
+async function deleteEvent(eventId) {
     // Ask for confirmation before deleting
-    if (!confirm("¿Estás seguro de que deseas eliminar este evento?")) {
+    const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¿Estás seguro de que deseas eliminar este evento?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) {
         return;
     }
 
@@ -12,9 +23,15 @@ function deleteEvent(eventId) {
     })
         .then((response) => {
             if (response.ok) {
-                alert("Evento eliminado con éxito");
-                // Reload the page to reflect the changes
-                location.reload();
+                Swal.fire({
+                    title: "Evento eliminado",
+                    text: "Evento eliminado con éxito",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    // Reload the page to reflect the changes
+                    location.reload();
+                });
             } else {
                 return response.json().then((data) => {
                     throw new Error(
@@ -23,12 +40,30 @@ function deleteEvent(eventId) {
                 });
             }
         })
-        .catch((error) => alert("Error: " + error.message));
+        .catch((error) => {
+            Swal.fire({
+                title: "Error",
+                text: "Error: " + error.message,
+                icon: "error",
+                confirmButtonText: "Entendido",
+            });
+        });
 }
 
-function deleteDate(dateId) {
+async function deleteDate(dateId) {
     // Ask for confirmation before deleting
-    if (!confirm("¿Estás seguro de que deseas eliminar esta fecha?")) {
+    const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¿Estás seguro de que deseas eliminar esta fecha?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) {
         return;
     }
 
@@ -40,9 +75,15 @@ function deleteDate(dateId) {
     })
         .then((response) => {
             if (response.ok) {
-                alert("Fecha eliminada con éxito");
-                // Reload the page to reflect the changes
-                location.reload();
+                Swal.fire({
+                    title: "Fecha eliminada",
+                    text: "Fecha eliminada con éxito",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    // Reload the page to reflect the changes
+                    location.reload();
+                });
             } else {
                 return response.json().then((data) => {
                     throw new Error(
@@ -51,5 +92,12 @@ function deleteDate(dateId) {
                 });
             }
         })
-        .catch((error) => alert("Error: " + error.message));
+        .catch((error) => {
+            Swal.fire({
+                title: "Error",
+                text: "Error: " + error.message,
+                icon: "error",
+                confirmButtonText: "Entendido",
+            });
+        });
 }

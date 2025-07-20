@@ -7,7 +7,12 @@ async function addCompanion(eventId) {
     //   'http://127.0.0.1:8000/assistant/get-by-id-number/1750319731' \
     //   -H 'accept: application/json'
     if (!companionIdentification) {
-        alert("Por favor, ingresa la identificación del acompañante.");
+        Swal.fire({
+            title: "Identificación requerida",
+            text: "Por favor, ingresa la identificación del acompañante.",
+            icon: "warning",
+            confirmButtonText: "Entendido",
+        });
         return;
     }
 
@@ -24,15 +29,21 @@ async function addCompanion(eventId) {
         })
         .then((data) => {
             acompañante = data;
-            alert(
-                `Acompañante encontrado: ${data.first_name} ${data.last_name}.`
-            );
+            Swal.fire({
+                title: "Acompañante encontrado",
+                text: `Acompañante encontrado: ${data.first_name} ${data.last_name}.`,
+                icon: "success",
+                confirmButtonText: "Continuar",
+            });
         })
         .catch((error) => {
             console.error(error);
-            alert(
-                "Ocurrió un error al añadir el acompañante. Revise si la identificación es correcta."
-            );
+            Swal.fire({
+                title: "Error de búsqueda",
+                text: "Ocurrió un error al añadir el acompañante. Revise si la identificación es correcta.",
+                icon: "error",
+                confirmButtonText: "Entendido",
+            });
             return;
         });
 
@@ -57,10 +68,20 @@ async function addCompanion(eventId) {
             return response.json();
         })
         .then((data) => {
-            alert("Acompañante añadido al evento con éxito.");
+            Swal.fire({
+                title: "Acompañante añadido",
+                text: "Acompañante añadido al evento con éxito.",
+                icon: "success",
+                confirmButtonText: "OK",
+            });
         })
         .catch((error) => {
             console.error(error);
-            alert("Ocurrió un error al añadir el acompañante al evento.");
+            Swal.fire({
+                title: "Error",
+                text: "Ocurrió un error al añadir el acompañante al evento.",
+                icon: "error",
+                confirmButtonText: "Intentar de nuevo",
+            });
         });
 }

@@ -59,13 +59,23 @@
         // Validaciones del lado del cliente
         if (selectedDate < today) {
             event.preventDefault();
-            alert('La fecha del evento debe ser futura.');
+            Swal.fire({
+                title: 'Fecha inválida',
+                text: 'La fecha del evento debe ser futura.',
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
 
         if (startTime >= endTime) {
             event.preventDefault();
-            alert('La hora de fin debe ser mayor a la hora de inicio.');
+            Swal.fire({
+                title: 'Horarios inválidos',
+                text: 'La hora de fin debe ser mayor a la hora de inicio.',
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
 
@@ -91,15 +101,30 @@
 
                 // Verificar si es un error de fecha duplicada
                 if (response.status === 422 || errorText.includes('duplicate') || errorText.includes('duplicada')) {
-                    alert('Esta fecha ya existe para el evento. Por favor, selecciona una fecha diferente.');
+                    Swal.fire({
+                        title: 'Fecha duplicada',
+                        text: 'Esta fecha ya existe para el evento. Por favor, selecciona una fecha diferente.',
+                        icon: 'error',
+                        confirmButtonText: 'Entendido'
+                    });
                 } else {
                     // Para otros errores
-                    alert('Error al crear la fecha del evento. Por favor, inténtalo de nuevo.');
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Error al crear la fecha del evento. Por favor, inténtalo de nuevo.',
+                        icon: 'error',
+                        confirmButtonText: 'Intentar de nuevo'
+                    });
                 }
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error de conexión. Por favor, verifica tu conexión a internet e inténtalo de nuevo.');
+            Swal.fire({
+                title: 'Error de conexión',
+                text: 'Error de conexión. Por favor, verifica tu conexión a internet e inténtalo de nuevo.',
+                icon: 'error',
+                confirmButtonText: 'Reintentar'
+            });
         }
     });
 </script>

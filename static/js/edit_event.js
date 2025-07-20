@@ -15,15 +15,23 @@ function editEvent(eventId) {
         !capacity ||
         !capacityType
     ) {
-        alert("Por favor, complete todos los campos.");
+        Swal.fire({
+            title: "Campos incompletos",
+            text: "Por favor, complete todos los campos.",
+            icon: "warning",
+            confirmButtonText: "Entendido",
+        });
         event.preventDefault();
         return;
     }
 
     if (!mapsLink.startsWith("https://maps.app.goo.gl/")) {
-        alert(
-            'El enlace de Google Maps debe comenzar con "https://maps.app.goo.gl/"'
-        );
+        Swal.fire({
+            title: "Enlace inválido",
+            text: 'El enlace de Google Maps debe comenzar con "https://maps.app.goo.gl/"',
+            icon: "error",
+            confirmButtonText: "Entendido",
+        });
         event.preventDefault();
         return;
     }
@@ -39,10 +47,21 @@ function editEvent(eventId) {
         },
     }).then((response) => {
         if (response.ok) {
-            alert("Evento editado con éxito");
-            window.location.reload();
+            Swal.fire({
+                title: "Evento editado",
+                text: "Evento editado con éxito",
+                icon: "success",
+                confirmButtonText: "OK",
+            }).then(() => {
+                window.location.reload();
+            });
         } else {
-            alert("Error al editar el evento");
+            Swal.fire({
+                title: "Error",
+                text: "Error al editar el evento",
+                icon: "error",
+                confirmButtonText: "Intentar de nuevo",
+            });
         }
     });
 }
@@ -55,10 +74,21 @@ function editImageEvent(eventId) {
         body: formData,
     }).then((response) => {
         if (response.ok) {
-            alert("Imagen del evento editada con éxito");
-            window.location.reload();
+            Swal.fire({
+                title: "Imagen editada",
+                text: "Imagen del evento editada con éxito",
+                icon: "success",
+                confirmButtonText: "OK",
+            }).then(() => {
+                window.location.reload();
+            });
         } else {
-            alert("Error al editar la imagen del evento");
+            Swal.fire({
+                title: "Error",
+                text: "Error al editar la imagen del evento",
+                icon: "error",
+                confirmButtonText: "Intentar de nuevo",
+            });
         }
     });
 }

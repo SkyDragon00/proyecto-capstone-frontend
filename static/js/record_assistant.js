@@ -21,9 +21,12 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
             })
             .catch((error) => {
                 console.error(error);
-                alert(
-                    "Ocurrió un error al buscar el asistente. Revise si la identificación es correcta."
-                );
+                Swal.fire({
+                    title: "Error de búsqueda",
+                    text: "Ocurrió un error al buscar el asistente. Revise si la identificación es correcta.",
+                    icon: "error",
+                    confirmButtonText: "Entendido",
+                });
                 throw new Error(
                     "Error al buscar el asistente: " + error.message
                 );
@@ -42,20 +45,39 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
         .then((response) => response.json())
         .then((data) => {
             if (data.detail == "Registration not found") {
-                alert("La persona no se encuentra registrada en el evento.");
+                Swal.fire({
+                    title: "No registrado",
+                    text: "La persona no se encuentra registrada en el evento.",
+                    icon: "warning",
+                    confirmButtonText: "Entendido",
+                });
             } else if (
                 typeof data.detail === "string" &&
                 data.detail.includes("Duplicate entry")
             ) {
-                alert("La persona ya se encuentra registrada en el evento.");
+                Swal.fire({
+                    title: "Ya registrado",
+                    text: "La persona ya se encuentra registrada en el evento.",
+                    icon: "info",
+                    confirmButtonText: "Entendido",
+                });
             } else {
-                alert("Asistencia registrada correctamente.");
+                Swal.fire({
+                    title: "Asistencia registrada",
+                    text: "Asistencia registrada correctamente.",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                });
             }
         })
         .catch((error) => {
             console.log(error);
-
-            alert("Error: " + error);
+            Swal.fire({
+                title: "Error",
+                text: "Error: " + error,
+                icon: "error",
+                confirmButtonText: "Entendido",
+            });
         });
 
     location.reload();

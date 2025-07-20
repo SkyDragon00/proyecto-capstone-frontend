@@ -1,7 +1,7 @@
 // static/js/edit_organizer.js
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("edit-form");
-    
+
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -13,19 +13,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Validar que al menos un campo esté lleno
         if (!firstName && !lastName && !email && !password) {
-            alert("Debe proporcionar al menos un campo para actualizar");
+            Swal.fire({
+                title: "Campos vacíos",
+                text: "Debe proporcionar al menos un campo para actualizar",
+                icon: "warning",
+                confirmButtonText: "Entendido",
+            });
             return;
         }
 
         // Validar email si se proporciona
         if (email && !isValidEmail(email)) {
-            alert("Por favor ingrese un email válido");
+            Swal.fire({
+                title: "Email inválido",
+                text: "Por favor ingrese un email válido",
+                icon: "error",
+                confirmButtonText: "Entendido",
+            });
             return;
         }
 
         // Validar contraseña si se proporciona
         if (password && !isValidPassword(password)) {
-            alert("La contraseña debe tener al menos 9 caracteres, 1 letra minúscula, 1 letra mayúscula, 1 dígito y 1 carácter especial");
+            Swal.fire({
+                title: "Contraseña inválida",
+                text: "La contraseña debe tener al menos 9 caracteres, 1 letra minúscula, 1 letra mayúscula, 1 dígito y 1 carácter especial",
+                icon: "error",
+                confirmButtonText: "Entendido",
+            });
             return;
         }
 

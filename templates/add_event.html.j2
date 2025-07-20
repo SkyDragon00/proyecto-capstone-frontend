@@ -74,12 +74,22 @@
 
         if (!name || !description || !location || !mapsLink || !capacity || !capacityType) {
             event.preventDefault();
-            alert('Por favor, complete todos los campos.');
+            Swal.fire({
+                title: 'Campos incompletos',
+                text: 'Por favor, complete todos los campos.',
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+            });
         }
 
         if (!mapsLink.startsWith("https://maps.app.goo.gl/")) {
             event.preventDefault();
-            alert('El enlace de Google Maps debe comenzar con "https://maps.app.goo.gl/"');
+            Swal.fire({
+                title: 'Enlace inválido',
+                text: 'El enlace de Google Maps debe comenzar con "https://maps.app.goo.gl/"',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
         }
     });
 </script>

@@ -103,13 +103,23 @@
 
         if (!firstName || !lastName || !email) {
             e.preventDefault();
-            alert('No puedes dejar campos obligatorios vacíos.');
+            Swal.fire({
+                title: 'Campos obligatorios',
+                text: 'No puedes dejar campos obligatorios vacíos.',
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
 
         if (email && !isValidEmail(email)) {
             e.preventDefault();
-            alert('Por favor, introduce un email válido y este debe ser de la UDLA (udla.edu.ec).');
+            Swal.fire({
+                title: 'Email inválido',
+                text: 'Por favor, introduce un email válido y este debe ser de la UDLA (udla.edu.ec).',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
     });

@@ -16,10 +16,21 @@ function saveSettings() {
         }
     ).then((response) => {
         if (response.ok) {
-            alert("Configuración guardada con éxito.");
-            location.reload();
+            Swal.fire({
+                title: "Configuración guardada",
+                text: "Configuración guardada con éxito.",
+                icon: "success",
+                confirmButtonText: "OK",
+            }).then(() => {
+                location.reload();
+            });
         } else {
-            alert("Error al guardar la configuración.");
+            Swal.fire({
+                title: "Error",
+                text: "Error al guardar la configuración.",
+                icon: "error",
+                confirmButtonText: "Intentar de nuevo",
+            });
         }
     });
 }
