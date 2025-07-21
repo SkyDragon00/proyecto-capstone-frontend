@@ -3,37 +3,57 @@
 {% block title %}Fecha del Evento{% endblock title %}
 
 {% block head %}
-{#
-<link rel="stylesheet" href="{{ url_for('static', path='css/.css') }}" /> #}
+<link rel="stylesheet" href="{{ url_for('static', path='css/event-dates-style.css') }}" />
 {% endblock head %}
 
 {% block main %}
-<a href="/{{ event_id }}/create-date" class="a-button-filled-red">Añadir Fecha</a>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Fecha</th>
-            <th>Hora de Inicio</th>
-            <th>Hora de Fin</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for date in event_dates %}
-        <tr>
-            <td>{{ date.id }}</td>
-            <td>{{ date.day_date }}</td>
-            <td>{{ date.start_time }}</td>
-            <td>{{ date.end_time }}</td>
-            <td>
-                <button onclick="deleteDate({{ date.id }})">Eliminar</button>
-                <a href="/events/attendances-users/{{ date.id }}">Asistencia</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="event-dates-container">
+    <div class="page-header">
+        <h1 class="page-title">Fechas del Evento</h1>
+        <a href="/{{ event_id }}/create-date" class="add-date-btn">
+            <span>+ Añadir Fecha</span>
+        </a>
+    </div>
+
+    {% if event_dates and event_dates|length > 0 %}
+    <div class="dates-table-container">
+        <table class="dates-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Hora de Inicio</th>
+                    <th>Hora de Fin</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for date in event_dates %}
+                <tr>
+                    <td class="date-id">{{ date.id }}</td>
+                    <td class="date-value">{{ date.day_date }}</td>
+                    <td class="time-value">{{ date.start_time }}</td>
+                    <td class="time-value">{{ date.end_time }}</td>
+                    <td class="actions-cell">
+                        <button onclick="deleteDate({{ date.id }})" class="btn-delete">
+                            Eliminar
+                        </button>
+                        <a href="/events/attendances-users/{{ date.id }}" class="btn-attendance">
+                            Ver Asistencia
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No hay fechas programadas</h3>
+        <p>Añade la primera fecha para este evento usando el botón de arriba.</p>
+    </div>
+    {% endif %}
+</div>
 {% endblock main %}
 
 {% block scripts %}
