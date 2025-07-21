@@ -455,6 +455,7 @@ async def events(
     request: Request,
     settings: SettingsDependency,
     role: Annotated[str | None, Cookie()] = None,
+    message: Annotated[str | None, Query()] = None,
 ):
     """Endpoint to retrieve the events page with upcoming events.
 
@@ -482,6 +483,7 @@ async def events(
             "events": events,
             "role": role,
             "api_url": settings.API_URL,
+            "message": message
         }
     )
 
@@ -766,7 +768,7 @@ async def register_to_event(
         )
 
     return RedirectResponse(
-        url="/events",
+        url="/events?message=success_inscription",
         status_code=status.HTTP_303_SEE_OTHER
     )
 

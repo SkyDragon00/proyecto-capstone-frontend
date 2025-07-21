@@ -20,3 +20,16 @@
     </ul>
 </section>
 {% endblock main %}
+
+{% block scripts %}
+{% if message == "success_inscription" %}
+<script>
+    Swal.fire({
+        title: '¡Gracias Por Inscribirte!',
+        text: 'Te has registrado exitosamente en el evento.',
+        icon: 'success',
+        confirmButtonText: 'Continuar'
+    });
+</script>
+{% endif %}
+{% endblock scripts %}
