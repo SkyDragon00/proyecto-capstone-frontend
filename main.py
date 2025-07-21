@@ -4,6 +4,7 @@ import json
 from typing import Annotated
 from uuid import UUID
 from fastapi import Cookie, FastAPI, Form, HTTPException, Path, Request, UploadFile, File, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -25,6 +26,17 @@ templates.env.filters["strftime"] = lambda date_str: (  # type: ignore
     datetime.fromisoformat(date_str.replace(
         'Z', '+00:00')).strftime('%d/%m/%Y %H:%M')
 )
+
+
+# Manejador para errores de validación
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    # Si es un Validation error: del access_token rederigir al login
+    if "access_token" in str(exc):
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
 
 
 @app.get(
