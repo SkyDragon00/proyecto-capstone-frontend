@@ -3,7 +3,7 @@ import tempfile
 import json
 from typing import Annotated
 from uuid import UUID
-from fastapi import Cookie, FastAPI, Form, HTTPException, Path, Request, UploadFile, File, status
+from fastapi import Cookie, FastAPI, Form, HTTPException, Path, Query, Request, UploadFile, File, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -87,6 +87,7 @@ async def home(
 async def terms(
     request: Request,
     settings: SettingsDependency,
+    role: Annotated[str | None, Cookie()] = None
 ):
     """Endpoint to retrieve the terms and conditions page.
 
@@ -104,6 +105,7 @@ async def terms(
         context={
             "request": request,
             "api_url": settings.API_URL,
+            "role": role,
         }
     )
 
@@ -175,6 +177,7 @@ def login(
     request: Request,
     settings: SettingsDependency,
     role: Annotated[str | None, Cookie()] = None,
+    message: Annotated[str | None, Query()] = None,
 ):
     """Endpoint to retrieve the login page.
 
@@ -193,6 +196,7 @@ def login(
             "request": request,
             "role": role,
             "api_url": settings.API_URL,
+            "message": message
         }
     )
 

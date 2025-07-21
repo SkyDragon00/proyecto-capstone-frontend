@@ -55,3 +55,19 @@
     </div>
 </div>
 {% endblock main %}
+
+{% block scripts %}
+
+{% if message == "new_user" %}
+<script>
+    Swal.fire({
+        title: '¡Bienvenido!',
+        text: 'Tu cuenta ha sido creada exitosamente. Por favor, inicia sesión.',
+        icon: 'success',
+        confirmButtonText: 'Continuar'
+    });
+</script>
+{% endif %}
+{# {% elif message == "login_success" %} #}
+
+{% endblock scripts %}

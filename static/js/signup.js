@@ -203,7 +203,7 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
     })
         .then((response) => {
             if (response.ok) {
-                window.location.href = "/login";
+                window.location.href = "/login?message=new_user";
             } else {
                 return response.json().then((errorText) => {
                     if (
