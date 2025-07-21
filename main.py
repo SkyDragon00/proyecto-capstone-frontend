@@ -399,6 +399,10 @@ async def record_assistant_with_data(
         files=file  # type: ignore
     )
 
+    alert_already_assisted = False
+    if assistants.status_code == status.HTTP_404_NOT_FOUND and assistants.json().get("detail") == "No similar people found in the main database, but some people have already assisted to the event":
+        alert_already_assisted = True
+
     alert_no_face = False
     if assistants.status_code == status.HTTP_400_BAD_REQUEST:
         alert_no_face = True
@@ -421,6 +425,7 @@ async def record_assistant_with_data(
             "default_message": "No se puede reconocer el rostro o no coincide con ningún asistente registrado.",
             "role": role,
             "alert_no_face": alert_no_face,
+            "alert_already_assisted": alert_already_assisted,
         }
     )
 

@@ -67,6 +67,8 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
                     text: "Asistencia registrada correctamente.",
                     icon: "success",
                     confirmButtonText: "OK",
+                }).then(() => {
+                    window.location.href = `/record-assistant/${eventId}/${eventDateId}`;
                 });
             }
         })
@@ -77,8 +79,10 @@ async function sendAttendance(eventDateId, eventId, assistantId) {
                 text: "Error: " + error,
                 icon: "error",
                 confirmButtonText: "Entendido",
+            }).then(() => {
+                location.reload();
             });
         });
 
-    location.reload();
+    // location.reload();
 }

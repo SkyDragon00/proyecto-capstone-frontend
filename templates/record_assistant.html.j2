@@ -181,4 +181,17 @@
     });
 </script>
 {% endif %}
+
+{% if alert_already_assisted %}
+<script>
+    Swal.fire({
+        title: 'Asistencia ya registrada',
+        text: 'El asistente ya ha registrado su asistencia a este evento.',
+        icon: 'info',
+        confirmButtonText: 'Entendido'
+    }).then(() => {
+        window.location.href = "/record-assistant/{{ event_id }}/{{ event_date_id }}";
+    });
+</script>
+{% endif %}
 {% endblock scripts %}
